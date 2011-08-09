@@ -1,0 +1,93 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<configuration>
+  <!-- NHibernate.Glimpse 
+   [EXAMPLE NH CONFIG]
+  
+  <hibernate-configuration xmlns="urn:nhibernate-configuration-2.2">
+    <session-factory name="Default">
+      ...
+      
+      [VERIFY THESE SETTINGS FOR PROPER SQL FORMATTING]
+      <property name="show_sql">true</property>
+      <property name="format_sql">true</property>
+      ...
+      
+      [ADD THIS LISTENER FOR ENTITY LOAD STATISTICS]
+      <event type="post-load">
+        <listener class="NHibernate.Glimpse.EntityPostLoadListener, NHibernate.Glimpse"/>  
+      </event>
+      
+      NOTE: I've had mixed results with configuring the listener in the config, perhaps something has 
+      changed with NHibernate and I am researching it. As an alternate, you can do something like this in code:
+      "config.SetListener(ListenerType.PostLoad, new EntityPostLoadListener());"
+      The listener extends from the default post load listener, so it is safe to replace the default with this one.
+      ...
+      
+    </session-factory>
+  </hibernate-configuration>
+  -->
+  <appSettings>
+    <!-- NHibernate.Glimpse
+    Alternately, you can configure in code like: "LoggerProvider.SetLoggersFactory(new LoggerFactory());"
+    NOTE: IIS 7 does not allow access to HttpContext.Current in Application_Start, so if you're currently configuring
+    your ISessionFactory there, you will get an error thrown "Request is not available in this context" in the 
+    NHibernate.Glimpse logger.
+    
+    follow this process to work around this issue...
+      
+    // in Global.asax
+    void Application_BeginRequest(Object source, EventArgs e)
+    {
+        var app = (HttpApplication)source;
+        var context = app.Context;
+        // Attempt to peform first request initialization
+        FirstRequestInitialization.Initialize(context);
+    }
+
+    //new class for one-time factory initialization
+    class FirstRequestInitialization
+    {
+        private static bool _initializedAlready;
+        private static readonly object Lock = new object();
+
+        public static void Initialize(HttpContext context)
+        {
+            if (_initializedAlready)
+            {
+                return;
+            }
+            lock (Lock)
+            {
+                if (_initializedAlready) return;
+                var config = new Cfg.Configuration();
+                config.AddClass(typeof (Cat));
+                
+                // NHibernate.Glimpse extensions
+                config.SetListener(ListenerType.PostLoad, new EntityPostLoadListener());
+                LoggerProvider.SetLoggersFactory(new LoggerFactory());
+                // /NHibernate.Glimpse extensions
+                    
+                MvcApplication.SessionFactory = config.BuildSessionFactory();
+                _initializedAlready = true;
+            }
+        }
+    }
+    -->
+    <add key="nhibernate-logger" value="NHibernate.Glimpse.LoggerFactory, NHibernate.Glimpse"/>
+    <!-- /NHibernate.Glimpse -->
+  </appSettings>
+  <system.web>
+    <httpHandlers>
+      <!-- NHibernate.Glimpse -->
+      <add path="nhibernate.glimpse.axd" verb="GET" type="NHibernate.Glimpse.Profiler, NHibernate.Glimpse" />
+      <!-- /NHibernate.Glimpse -->
+    </httpHandlers>
+  </system.web>
+  <system.webServer>
+    <handlers>
+      <!-- NHibernate.Glimpse -->
+      <add name="NHibernate.Glimpse" path="nhibernate.glimpse.axd" verb="GET" type="NHibernate.Glimpse.Profiler, NHibernate.Glimpse" preCondition="integratedMode" />
+      <!-- NHibernate.Glimpse -->
+    </handlers>
+  </system.webServer>
+</configuration>

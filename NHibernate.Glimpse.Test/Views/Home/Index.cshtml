@@ -1,0 +1,17 @@
+﻿@using NHibernate.Glimpse.Test.Models
+@model Cat
+
+@{
+    ViewBag.Title = "Index";
+}
+
+<h2>Index</h2>
+<div>
+@Html.ActionLink("Execute", "ExecuteCommands")
+</div>
+<div>
+@Html.ActionLink("Execute with redirect", "ExecuteCommandsWithRedirect")
+</div>
+<div>
+@Ajax.ActionLink("Execute async", "ExecuteCommandsAsync", "Home", new AjaxOptions{HttpMethod = "POST"})
+</div>

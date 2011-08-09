@@ -1,0 +1,140 @@
+
+Using NHibernate.Glimpse
+-------------
+
+1. Read the Glimpse readme.txt
+2. (this should be automatic via NuGet's tranformation)
+
+<system.web>
+
+	  <!-- NHibernate.Glimpse 
+	   [EXAMPLE NH CONFIG - just adapt to your own process if you use fluent or loquacious configurations...]
+  
+	  <hibernate-configuration xmlns="urn:nhibernate-configuration-2.2">
+		<session-factory name="Default">
+		  ...
+	  
+		  [VERIFY THESE SETTINGS FOR PROPER SQL FORMATTING]
+		  <property name="show_sql">true</property>
+		  <property name="format_sql">true</property>
+		  ...
+	  
+		  [ADD THIS LISTENER FOR ENTITY LOAD STATISTICS]
+		  <listener type="post-load" class="NHibernate.Glimpse.EntityPostLoadListener, NHibernate.Glimpse"/>
+
+			NOTE: I've had mixed results with configuring the listener in the config, perhaps something has changed with NHibernate.
+			As an alternate, you can do something like this in code:
+			"config.SetListener(ListenerType.PostLoad, new EntityPostLoadListener());"
+			The listener extends from the default post load listener.
+			?could this be related to * [NH-1237] - Cannot set PostLoadEventListener event listeners.
+		  ...
+
+		  [ADD THIS PROPERTY FOR SESSION FACTORY STATISTICS]
+		  <property name="generate_statistics">true</property>
+	  
+		</session-factory>
+	  </hibernate-configuration>
+	  -->
+
+	...
+	<appSettings>
+		...
+		<!-- NHibernate.Glimpse
+		Alternately, you can configure in code like: "LoggerProvider.SetLoggersFactory(new LoggerFactory());"
+		NOTE: IIS 7 does not allow access to HttpContext.Current in Application_Start, so if you're currently configuring
+		your ISessionFactory there, you will get an error thrown "Request is not available in this context" in the 
+		NHibernate.Glimpse logger.
+	
+		follow this process to work around this issue...
+	  
+		// in Global.asax
+		void Application_BeginRequest(Object source, EventArgs e)
+		{
+			var app = (HttpApplication)source;
+			var context = app.Context;
+			// Attempt to peform first request initialization
+			FirstRequestInitialization.Initialize(context);
+		}
+
+		//new class for one-time factory initialization
+		class FirstRequestInitialization
+		{
+			private static bool _initializedAlready;
+			private static readonly object Lock = new object();
+
+			public static void Initialize(HttpContext context)
+			{
+				if (_initializedAlready)
+				{
+					return;
+				}
+				lock (Lock)
+				{
+					if (_initializedAlready) return;
+					var config = new Cfg.Configuration();
+					config.AddClass(typeof (Cat));
+					
+					config.SetListener(ListenerType.PostLoad, new EntityPostLoadListener());
+					LoggerProvider.SetLoggersFactory(new LoggerFactory());
+					
+					MvcApplication.SessionFactory = config.BuildSessionFactory();
+					_initializedAlready = true;
+				}
+			}
+		}
+	
+		-->
+		<add key="nhibernate-logger" value="NHibernate.Glimpse.LoggerFactory, NHibernate.Glimpse"/>
+	</appSettings>
+	...
+	<httpHandlers>
+		<add path="glimpse.axd" verb="GET,POST" type="Glimpse.Core.Handler" />
+		<add path="nhibernate.glimpse.axd" verb="GET" type="NHibernate.Glimpse.Profiler, NHibernate.Glimpse" />
+	</httpHandlers>
+</system.web>
+...
+</system.webServer>
+	...
+	<handlers>
+	  <add name="Glimpse" path="glimpse.axd" verb="GET,POST" type="Glimpse.Core.Handler,Glimpse.Core" preCondition="integratedMode" />
+	  <add name="NHibernate.Glimpse" path="nhibernate.glimpse.axd" verb="GET" type="NHibernate.Glimpse.Profiler, NHibernate.Glimpse" preCondition="integratedMode" />
+	</handlers>
+</system.webServer>
+
+3. If you would like additional statistics then use this simple API...
+
+//after you build your factory - a one time call (process level) and thread safe
+NHibernate.Glimpse.Plugin.RegisterSessionFactory(ISessionFactory);
+
+4. Done.
+
+More to come...
+
+changes from 8.4
+1. Added Session Factory statistics gathering
+
+changes from 8.3
+1. removed the config helper method.  I would prefer that the plugin components are registered with NH as you see fit...
+2. additional minor bug fixes.
+3. added the registration points for ISessionFactory and ISession, but we're not capturing statistics yet.
+4. added the requirement to add the logger factory in app settings back in - we noticed some use cases where the programmatic
+configuration would fail, but this seems seems bullet-proof (and follows the #1 philosophy)
+
+changes from 8.2 (8.2 was a FAIL!)
+1. fixed the relative path bug.
+2. fixed the logger null reference exception.
+3. trimmed the debug log to only show important session and DB activity - still tweaking...
+4. removed the requirement to add the logger factory in app settings.
+5. minor style tweaks.
+
+changes from 8.1
+1. fixed bug where cookie was attempted to be added to response after flush.
+2. Added the per/request debug log infrastructure - more styling on this coming soon.
+
+changes from 8.0
+1. Removed the Log4Net dependency
+2. Rolled own HttpContext aware log factory for NHibernate.
+3. Stats are now accurate (although firing quick requests can show more than one entry, but the entry stats are correct). Still working on this.
+4. Added handler for log details.
+5. Removed all request locking.  The only potential locking is via the use of the concurrent dictionary in the plugin. However, all requests that are not glimpse requests are lock-free. So this plugin can be used in Production mode.
+ 
