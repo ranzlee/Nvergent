@@ -8,6 +8,7 @@ using System.Web;
 
 namespace NHibernate.Glimpse.Core
 {
+    //TODO: refactor
     public static class Profiler
     {
         private static string _stylesheet;
