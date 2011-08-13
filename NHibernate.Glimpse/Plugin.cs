@@ -45,6 +45,13 @@ namespace NHibernate.Glimpse
             var log = (context.Items[GlimpseLogKey] == null) ? new List<string>() : (IList<string>)context.Items[GlimpseLogKey];
             if (log == null) return string.Empty;
             var logs = Logs.GetOrAdd(cookie.Value, new List<IList<string>>());
+
+            if (!KeepLogHistory)
+            {
+                
+                stats.Clear();
+            }
+
             stats.Add(stat);
             logs.Add(log);
             var data = new List<object[]>();
@@ -159,6 +166,14 @@ namespace NHibernate.Glimpse
             {
                 if (!SessionFactories.Contains(sessionFactory)) SessionFactories.Add(sessionFactory);    
             }
+        }
+
+        private static bool _keepLogHistory = true;
+        
+        public static bool KeepLogHistory
+        {
+            get { return _keepLogHistory; }
+            set { _keepLogHistory = value; }
         }
     }
 }
