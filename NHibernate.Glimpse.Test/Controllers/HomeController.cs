@@ -35,19 +35,26 @@ namespace NHibernate.Glimpse.Test.Controllers
 
         private void DoCommands()
         {
-            var c = new Cat { BirthDate = DateTime.Now.AddYears(-1), Gender = "Female", Name = "Fluffy" };
+            var c = new Cat { BirthDate = DateTime.Now.AddYears(-2), Gender = "Female", Name = "Fluffy" };
+            var c2 = new Cat { BirthDate = DateTime.Now.AddYears(-1), Gender = "Female", Name = "Fluffy's Baby" };
             using (var session = MvcApplication.SessionFactory.OpenSession())
             {
                 HttpContext.Items.Add("session", session);
                 using (var t = session.BeginTransaction())
                 {
                     session.Save(c);
+                    c.Kittens.Add(c2);
+                    c2.Parent = c;
                     session.Flush();
                     session.Clear();
                     var cat = session.QueryOver<Cat>().Where(i => i.Id == c.Id).SingleOrDefault();
                     cat.Name = "Fluff";
                     t.Commit();
                 }    
+            }
+            using (var session = MvcApplication.SessionFactory.OpenSession())
+            {
+                var fluffysBaby = session.QueryOver<Cat>().Where(i => i.Id == c2.Id).SingleOrDefault();
             }
         }
     }
