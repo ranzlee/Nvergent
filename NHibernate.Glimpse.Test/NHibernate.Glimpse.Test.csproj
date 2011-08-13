@@ -76,6 +76,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Controllers\HomeController.cs" />
+    <Compile Include="EntityProvider.cs" />
     <Compile Include="FirstRequestInitialization.asax.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
@@ -193,8 +194,13 @@
     <None Include="nhibernate-mapping.xsd">
       <SubType>Designer</SubType>
     </None>
+    <Content Include="policy.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\NHibernate.DependencyInjection\NHibernate.DependencyInjection.csproj">
+      <Project>{6160F667-0FDC-457A-B8A0-CECFA718D37B}</Project>
+      <Name>NHibernate.DependencyInjection</Name>
+    </ProjectReference>
     <ProjectReference Include="..\NHibernate.Glimpse\NHibernate.Glimpse.csproj">
       <Project>{588C88A1-ADFD-4501-B42F-6977D932CCDD}</Project>
       <Name>NHibernate.Glimpse</Name>

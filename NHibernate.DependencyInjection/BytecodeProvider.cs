@@ -1,14 +1,15 @@
 ﻿using System;
 using NHibernate.Bytecode;
+using NHibernate.DependencyInjection.Core;
 using NHibernate.Properties;
 
-namespace NHibernate.DependencyInjection.Core
+namespace NHibernate.DependencyInjection
 {
-    internal class BytecodeProvider : AbstractBytecodeProvider
+    public class BytecodeProvider : AbstractBytecodeProvider
     {
         internal static IEntityProvider EntityInjector { get; private set; }
 
-        internal BytecodeProvider(IEntityProvider entityProvider)
+        public BytecodeProvider(IEntityProvider entityProvider)
         {
             if (entityProvider == null) throw new ArgumentNullException("entityProvider");
             EntityInjector = entityProvider;

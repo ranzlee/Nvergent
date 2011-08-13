@@ -1,5 +1,3 @@
-using NHibernate.DependencyInjection.Core;
-
 namespace NHibernate.DependencyInjection
 {
     public static class Initializer

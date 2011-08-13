@@ -46,7 +46,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Core\BytecodeProvider.cs" />
+    <Compile Include="BytecodeProvider.cs" />
     <Compile Include="Core\DynProxyTypeValidator.cs" />
     <Compile Include="Core\ProxyFactoryFactory.cs" />
     <Compile Include="Core\ReflectionOptimizer.cs" />

@@ -7,6 +7,11 @@
     <property name="Name" not-null="true" type="string" />
     <property name="BirthDate" not-null="true" type="datetime" />
     <property name="Gender" not-null="true" type="string" />
+    <set name="Kittens" cascade="all-delete-orphan" inverse="true" lazy="true">
+      <key column="ParentId" />
+      <one-to-many class="Cat"/>
+    </set>
+    <many-to-one class="Cat" column="ParentId" name="Parent" />
   </class>
 </hibernate-mapping>
 

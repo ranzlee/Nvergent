@@ -1,6 +1,9 @@
 using System.Web;
+using NHibernate.Cfg;
+using NHibernate.DependencyInjection;
 using NHibernate.Event;
 using NHibernate.Glimpse.Test.Models;
+using NHibernate.Tool.hbm2ddl;
 
 namespace NHibernate.Glimpse.Test
 {
@@ -18,15 +21,21 @@ namespace NHibernate.Glimpse.Test
             lock (Lock)
             {
                 if (_initializedAlready) return;
-                var config = new Cfg.Configuration();
+
+                Initializer.RegisterEntityProvider(new EntityProvider());
+
+                var config = new Configuration();
                 config.AddClass(typeof (Cat));
+
+                var tool = new SchemaExport(config);
+                tool.Execute(false, true, false);
 
                 config.SetListener(ListenerType.PostLoad, new EntityPostLoadListener());
                 LoggerProvider.SetLoggersFactory(new LoggerFactory());
                 
                 MvcApplication.SessionFactory = config.BuildSessionFactory();
                 Plugin.RegisterSessionFactory(MvcApplication.SessionFactory);
-                Plugin.KeepLogHistory = false;
+                //Plugin.KeepLogHistory = false;
 
                 _initializedAlready = true;
             }
