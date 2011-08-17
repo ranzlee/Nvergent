@@ -35,8 +35,8 @@ namespace NHibernate.Glimpse.Test.Controllers
 
         private void DoCommands()
         {
-            var c = new Cat { BirthDate = DateTime.Now.AddYears(-2), Gender = "Female", Name = "Fluffy" };
-            var c2 = new Cat { BirthDate = DateTime.Now.AddYears(-1), Gender = "Female", Name = "Fluffy's Baby" };
+            var c = new Cat("meow") { BirthDate = DateTime.Now.AddYears(-2), Gender = "Female", Name = "Fluffy" };
+            var c2 = new Cat("meow") { BirthDate = DateTime.Now.AddYears(-1), Gender = "Female", Name = "Fluffy's Baby" };
             using (var session = MvcApplication.SessionFactory.OpenSession())
             {
                 HttpContext.Items.Add("session", session);
@@ -55,6 +55,8 @@ namespace NHibernate.Glimpse.Test.Controllers
             using (var session = MvcApplication.SessionFactory.OpenSession())
             {
                 var fluffysBaby = session.QueryOver<Cat>().Where(i => i.Id == c2.Id).SingleOrDefault();
+
+                var fluffy = fluffysBaby.Parent;
             }
         }
     }

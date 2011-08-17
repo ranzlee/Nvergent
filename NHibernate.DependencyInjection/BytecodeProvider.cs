@@ -9,6 +9,11 @@ namespace NHibernate.DependencyInjection
     {
         internal static IEntityProvider EntityInjector { get; private set; }
 
+        public BytecodeProvider()
+        {
+            EntityInjector = new DefaultEntityProvider();
+        }
+
         public BytecodeProvider(IEntityProvider entityProvider)
         {
             if (entityProvider == null) throw new ArgumentNullException("entityProvider");

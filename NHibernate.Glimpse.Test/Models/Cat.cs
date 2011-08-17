@@ -4,11 +4,24 @@ using Iesi.Collections.Generic;
 
 namespace NHibernate.Glimpse.Test.Models
 {
-    public class Cat 
+    [Serializable]
+    public class Cat
     {
-        public Cat()
+        private readonly string _meow;
+
+        //rippo: required for proxy initialization
+        public Cat() { }
+
+        //rippo: this is a dependency injection example
+        public Cat(string meow)
         {
+            _meow = meow;
             _kittens = new HashedSet<Cat>();
+        }
+
+        public virtual string Meow()
+        {
+            return _meow;
         }
 
         public virtual int Id { get; protected set; }

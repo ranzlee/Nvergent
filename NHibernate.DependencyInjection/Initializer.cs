@@ -6,5 +6,10 @@ namespace NHibernate.DependencyInjection
         {
             Cfg.Environment.BytecodeProvider = new BytecodeProvider(provider);
         }
+
+        public static void RegisterEntityProvider()
+        {
+            Cfg.Environment.BytecodeProvider = new BytecodeProvider();
+        }
     }
 }
