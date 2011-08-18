@@ -4,7 +4,12 @@
     {
         protected override bool HasVisibleDefaultConstructor(System.Type type)
         {
-            return base.HasVisibleDefaultConstructor(type) || BytecodeProvider.EntityInjector.IsVaildWithoutDefaultConstructor(type);
+            var constructorParms = BytecodeProvider.EntityInjector.GetConstructorParameters(type);
+            if (constructorParms == null || constructorParms.Length == 0)
+            {
+                return base.HasVisibleDefaultConstructor(type);
+            }
+            return true;
         }
     }
 }

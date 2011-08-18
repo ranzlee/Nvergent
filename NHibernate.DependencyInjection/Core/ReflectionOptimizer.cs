@@ -1,4 +1,5 @@
-﻿using NHibernate.Properties;
+﻿using System;
+using NHibernate.Properties;
 
 namespace NHibernate.DependencyInjection.Core
 {
@@ -14,16 +15,17 @@ namespace NHibernate.DependencyInjection.Core
         {
             if (ReferenceEquals(mappedType, null)) return base.CreateInstance();
             if (ReferenceEquals(mappedType.FullName, null)) return base.CreateInstance();
-            var instance = BytecodeProvider.EntityInjector.CreateInstance(mappedType);
-            return instance ?? base.CreateInstance();
+            var constructorParms = BytecodeProvider.EntityInjector.GetConstructorParameters(mappedType);
+            return (constructorParms == null || constructorParms.Length == 0) 
+                ? base.CreateInstance() 
+                : Activator.CreateInstance(mappedType, constructorParms) ;
         }
 
         protected override void ThrowExceptionForNoDefaultCtor(System.Type type)
         {
-            if (ReferenceEquals(BytecodeProvider.EntityInjector.CreateInstance(type), null))
-            {
-                base.ThrowExceptionForNoDefaultCtor(type);
-            }
+            var constructorParms = BytecodeProvider.EntityInjector.GetConstructorParameters(type);
+            if (constructorParms != null && constructorParms.Length > 0) return;
+            base.ThrowExceptionForNoDefaultCtor(type);
         }
     }
 }

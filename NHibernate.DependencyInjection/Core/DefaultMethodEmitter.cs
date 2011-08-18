@@ -121,6 +121,10 @@ namespace NHibernate.DependencyInjection.Core
 				il.Emit(OpCodes.Ldc_I4, param.Position);
 				il.Emit(OpCodes.Ldelem_Ref);
 				var unboxedType = param.ParameterType.GetElementType();
+                if (unboxedType == null)
+                {
+                    throw new InvalidOperationException("unboxedType cannot be null");
+                }
 				il.Emit(OpCodes.Unbox_Any, unboxedType);
 				var stind = GetStindInstruction(param.ParameterType);
 				il.Emit(stind);

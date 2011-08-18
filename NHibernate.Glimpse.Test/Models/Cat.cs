@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using Iesi.Collections.Generic;
 
@@ -9,15 +10,16 @@ namespace NHibernate.Glimpse.Test.Models
     {
         private readonly string _meow;
 
-        //rippo: required for proxy initialization
-        public Cat() { }
-
         //rippo: this is a dependency injection example
         public Cat(string meow)
         {
             _meow = meow;
-            _kittens = new HashedSet<Cat>();
         }
+
+        //testing proxy generation for various constructors
+        //public Cat(){}
+
+        //public Cat(IList<object> list, IDictionary<string, object> dict){}
 
         public virtual string Meow()
         {
@@ -36,8 +38,8 @@ namespace NHibernate.Glimpse.Test.Models
         [Required]
         public virtual string Gender { get; set; }
 
-        private ISet<Cat> _kittens;
-        public virtual ISet<Cat> Kittens
+        private Iesi.Collections.Generic.ISet<Cat> _kittens = new HashedSet<Cat>();
+        public virtual Iesi.Collections.Generic.ISet<Cat> Kittens
         {
             get { return _kittens; }
             set { _kittens = value; }

@@ -1,3 +1,4 @@
+using System;
 using System.Reflection;
 using System.Reflection.Emit;
 using NHibernate.Proxy.DynamicProxy;
@@ -43,7 +44,10 @@ namespace NHibernate.DependencyInjection.Core
 					}
 					il.Emit(ldindInstruction);
 				}
-
+                if (parameterType == null)
+                {
+                    throw new InvalidOperationException("parameterType cannot be null");
+                }
 				if (parameterType.IsValueType || param.ParameterType.IsByRef || parameterType.IsGenericParameter)
 				{
 					il.Emit(OpCodes.Box, parameterType);

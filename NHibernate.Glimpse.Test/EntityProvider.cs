@@ -1,21 +1,19 @@
+using System;
 using NHibernate.DependencyInjection;
 using NHibernate.Glimpse.Test.Models;
 
 namespace NHibernate.Glimpse.Test
 {
-    //rippo: this is the provider implementation for DI with NH
+    //rippo: this is the provider implementation for DI with NH - 
+    //this is optional (not required for entities with default constructors)
     public class EntityProvider : IEntityProvider
     {
-        public object CreateInstance(System.Type type)
-        {
-            return type == typeof(Cat) ? new Cat("purrrr..... purrrrr.....") : null;
-        }
+        private const string CatBehavior = "purrrr..... purrrrr.....";
 
-        //rippo: I'm thinking of removing this because now a default constructor is always required,
-        //even though you can overload constructors for DI
-        public bool IsVaildWithoutDefaultConstructor(System.Type type)
+        public object[] GetConstructorParameters(System.Type type)
         {
-            return true;
+            if (type == typeof(Cat)) return new[] {CatBehavior};
+            return null;
         }
     }
 }
