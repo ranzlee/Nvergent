@@ -6,7 +6,7 @@ namespace NHibernate.Glimpse.Test
 {
     //rippo: this is the provider implementation for DI with NH - 
     //this is optional (not required for entities with default constructors)
-    public class EntityProvider : IEntityProvider
+    public class EntityInjector : IEntityInjector
     {
         private const string CatBehavior = "purrrr..... purrrrr.....";
 

@@ -197,17 +197,6 @@ namespace NHibernate.DependencyInjection.Core
             var il = constructor.GetILGenerator();
             constructor.SetImplementationFlags(MethodImplAttributes.IL);
             il.Emit(OpCodes.Ldarg_0);
-            //**bug**
-            //IL.Emit(OpCodes.Call, baseConstructor);
-            //**fix**
-            //rippo: here we have replaced the object base type with the correct base type - 
-            //update - now I have replaced and restructured so much that this is no longer relevant
-            //var typeConstructor = baseType.GetConstructor(System.Type.EmptyTypes);
-            //if (typeConstructor == null)
-            //{
-            //    throw new InvalidOperationException(string.Format("Could not determine constructor for {0}", baseType));
-            //}
-            //**end bug**
             for (var i = 0; i < parameters.Length; i++ )
             {
                 il.Emit(OpCodes.Ldarg_S, i + 1);

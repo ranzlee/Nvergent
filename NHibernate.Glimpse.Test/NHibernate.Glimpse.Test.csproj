@@ -110,7 +110,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Controllers\HomeController.cs" />
-    <Compile Include="EntityProvider.cs" />
+    <Compile Include="EntityInjector.cs" />
     <Compile Include="FirstRequestInitialization.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
@@ -232,7 +232,6 @@
     <None Include="nhibernate-mapping.xsd">
       <SubType>Designer</SubType>
     </None>
-    <Content Include="policy.config" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\NHibernate.DependencyInjection\NHibernate.DependencyInjection.csproj">
@@ -259,7 +258,7 @@
     <VisualStudio>
       <FlavorProperties GUID="{349c5851-65df-11da-9384-00065b846f21}">
         <WebProjectProperties>
-          <UseIIS>True</UseIIS>
+          <UseIIS>False</UseIIS>
           <AutoAssignPort>True</AutoAssignPort>
           <DevelopmentServerPort>1121</DevelopmentServerPort>
           <DevelopmentServerVPath>/</DevelopmentServerVPath>

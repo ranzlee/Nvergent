@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using Iesi.Collections.Generic;
 
@@ -10,16 +9,10 @@ namespace NHibernate.Glimpse.Test.Models
     {
         private readonly string _meow;
 
-        //rippo: this is a dependency injection example
         public Cat(string meow)
         {
             _meow = meow;
         }
-
-        //testing proxy generation for various constructors
-        //public Cat(){}
-
-        //public Cat(IList<object> list, IDictionary<string, object> dict){}
 
         public virtual string Meow()
         {

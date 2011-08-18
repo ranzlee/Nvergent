@@ -23,7 +23,7 @@ namespace NHibernate.Glimpse.Test
                 if (_initializedAlready) return;
 
                 //rippo: this is the initializer for the bytecodeprovider
-                Initializer.RegisterEntityProvider(new EntityProvider());
+                Initializer.RegisterBytecodeProvider(new EntityInjector());
 
                 //rippo: if you don't care to use DI and all of your entities have default constructors, 
                 //just use the overload initializer

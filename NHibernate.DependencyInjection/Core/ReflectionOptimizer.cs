@@ -10,7 +10,6 @@ namespace NHibernate.DependencyInjection.Core
              IGetter[] getters, 
              ISetter[] setters) : base(mappedType, getters, setters) { }
 
-    
         public override object CreateInstance()
         {
             if (ReferenceEquals(mappedType, null)) return base.CreateInstance();

@@ -1,6 +1,6 @@
 namespace NHibernate.DependencyInjection.Core
 {
-    public class DefaultEntityProvider : IEntityProvider
+    public class DefaultEntityInjector : IEntityInjector
     {
         public object[] GetConstructorParameters(System.Type type)
         {
