@@ -9,10 +9,13 @@ namespace NHibernate.DependencyInjection
 {
     /// <summary>
     /// Custom bytecode provider for NHibernate. 
-    /// Creates verifiable proxy types for medium trust environments. see permission demands below
+    /// Creates verifiable proxy types for medium trust environments.
     /// Supports dependency injection scenarios.
     /// All credit goes to the NHibernate / LinFu developers - most of this code is theirs with only minor
     /// modifications for bug fixes, enhancements.
+    /// Required permissions above default medium trust: 
+    /// ConfigurationPermission -> unrestricted
+    /// ReflectionPermission -> RestrictedMemberAccess, ReflectionEmit
     /// </summary>
     [ConfigurationPermission(SecurityAction.Demand, Unrestricted = true)]
     [ReflectionPermission(SecurityAction.Demand, MemberAccess = true, ReflectionEmit = true, RestrictedMemberAccess = true)]
