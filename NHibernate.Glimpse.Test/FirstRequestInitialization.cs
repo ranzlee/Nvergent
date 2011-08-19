@@ -27,7 +27,7 @@ namespace NHibernate.Glimpse.Test
 
                 //rippo: if you don't care to use DI and all of your entities have default constructors, 
                 //just use the overload initializer
-                //Initializer.RegisterEntityProvider();
+                //Initializer.RegisterBytecodeProvider();
 
                 var config = new Configuration();
                 config.AddClass(typeof (Cat));
@@ -36,11 +36,10 @@ namespace NHibernate.Glimpse.Test
                 tool.Execute(false, true, false);
 
                 config.SetListener(ListenerType.PostLoad, new EntityPostLoadListener());
-                LoggerProvider.SetLoggersFactory(new LoggerFactory());
                 
                 MvcApplication.SessionFactory = config.BuildSessionFactory();
                 Plugin.RegisterSessionFactory(MvcApplication.SessionFactory);
-                Plugin.KeepLogHistory = true;
+                //Plugin.KeepLogHistory = false;
 
                 _initializedAlready = true;
             }

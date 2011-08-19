@@ -3,13 +3,14 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
+using System.Web.SessionState;
 using Glimpse.Core.Extensibility;
 using NHibernate.Glimpse.Core;
 using NHibernate.Impl;
 
 namespace NHibernate.Glimpse
 {
-    [GlimpsePlugin]
+    [GlimpsePlugin(SessionRequired = true, ShouldSetupInInit = true)]
     public class Plugin : IGlimpsePlugin
     {
         private static readonly object Lock = new object();
@@ -19,6 +20,7 @@ namespace NHibernate.Glimpse
         internal const string GlimpseEntityLoadStatsKey = "NHibernate.Glimpse.Entity.Load.Stats";
         internal const string GlimpseLogKey = "NHibernate.Glimpse.Log";
         internal const string IngnoreResponseKey = "NHibernate.Glimpse.Ignore.Response";
+        internal const string IsBeingRedirectedKey = "NHibernate.Glimpse.Response.Redirect"; 
         internal static readonly ConcurrentDictionary<string, IList<RequestDebugInfo>> Statistics = new ConcurrentDictionary<string, IList<RequestDebugInfo>>();
         internal static readonly ConcurrentDictionary<string, IList<IList<string>>> Logs = new ConcurrentDictionary<string, IList<IList<string>>>();
 
@@ -45,13 +47,30 @@ namespace NHibernate.Glimpse
             var log = (context.Items[GlimpseLogKey] == null) ? new List<string>() : (IList<string>)context.Items[GlimpseLogKey];
             if (log == null) return string.Empty;
             var logs = Logs.GetOrAdd(cookie.Value, new List<IList<string>>());
-
             if (!KeepLogHistory)
             {
-                
-                stats.Clear();
+                if (context.Session == null || context.Session.Mode == SessionStateMode.Off)
+                {
+                    stats.Clear();
+                    logs.Clear();
+                }
+                else
+                {
+                    if (context.Session[IsBeingRedirectedKey] == null)
+                    {
+                        stats.Clear();
+                        logs.Clear();
+                    }
+                    else
+                    {
+                        context.Session[IsBeingRedirectedKey] = null;
+                    }
+                    if (context.Response.IsRequestBeingRedirected)
+                    {
+                        context.Session[IsBeingRedirectedKey] = true;
+                    }
+                }
             }
-
             stats.Add(stat);
             logs.Add(log);
             var data = new List<object[]>();
@@ -147,6 +166,7 @@ namespace NHibernate.Glimpse
 
         public void SetupInit()
         {
+            
         }
 
         public string Name

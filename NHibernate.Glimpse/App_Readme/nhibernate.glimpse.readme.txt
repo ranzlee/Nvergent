@@ -26,7 +26,6 @@ Using NHibernate.Glimpse
 			As an alternate, you can do something like this in code:
 			"config.SetListener(ListenerType.PostLoad, new EntityPostLoadListener());"
 			The listener extends from the default post load listener.
-			?could this be related to * [NH-1237] - Cannot set PostLoadEventListener event listeners.
 		  ...
 
 		  [ADD THIS PROPERTY FOR SESSION FACTORY STATISTICS]
@@ -74,10 +73,25 @@ Using NHibernate.Glimpse
 					var config = new Cfg.Configuration();
 					config.AddClass(typeof (Cat));
 					
-					config.SetListener(ListenerType.PostLoad, new EntityPostLoadListener());
-					LoggerProvider.SetLoggersFactory(new LoggerFactory());
+					//**IMPORTANT** - NHibernate.Glimpse stuff//
+
+					//for entity load stats...
+					config.SetListener(ListenerType.PostLoad, new NHibernate.Glimpse.EntityPostLoadListener());
 					
+					//for debug log - NOTE: setting the logger in appsettings does the same thing
+					LoggerProvider.SetLoggersFactory(new NHibernate.Glimpse.LoggerFactory());
+					
+					//for non-persistent logging (i.e. per-request like the other Glimpse data)
+					NHibernate.Glimpse.Plugin.KeepLogHistory = false;
+
+					//build factory
 					MvcApplication.SessionFactory = config.BuildSessionFactory();
+
+					//for session factory stats
+					NHibernate.Glimpse.Plugin.RegisterSessionFactory(MvcApplication.SessionFactory);
+
+					//**//
+
 					_initializedAlready = true;
 				}
 			}
@@ -104,11 +118,18 @@ Using NHibernate.Glimpse
 3. If you would like additional statistics then use this simple API...
 
 //after you build your factory - a one time call (process level) and thread safe
-NHibernate.Glimpse.Plugin.RegisterSessionFactory(ISessionFactory);
+NHibernate.Glimpse.Plugin.RegisterSessionFactory(myISessionFactory);
 
-4. Done.
+4. If you would like Glimpse data to be transient (like other Glimpse data)
+
+NHibernate.Glimpse.Plugin.KeepLogHistory = false;
+
+5. Done.
 
 More to come...
+
+changes from 8.5
+1. Added the ability to make log and SQL / entities loaded non-persistent (persistent logging has always been default and still is).
 
 changes from 8.4
 1. Added Session Factory statistics gathering
