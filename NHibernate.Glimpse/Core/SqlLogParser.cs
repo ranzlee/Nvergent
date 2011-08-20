@@ -8,7 +8,7 @@ using System.Web;
 
 namespace NHibernate.Glimpse.Core
 {
-    public static class Profiler
+    public static class SqlLogParser
     {
         private static string _stylesheet;
         private static string _script;

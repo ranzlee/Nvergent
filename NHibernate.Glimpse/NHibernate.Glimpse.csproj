@@ -57,7 +57,7 @@
     <Compile Include="EntityPostLoadListener.cs" />
     <Compile Include="Core\NoLogger.cs" />
     <Compile Include="LoggerFactory.cs" />
-    <Compile Include="Core\Profiler.cs" />
+    <Compile Include="Core\SqlLogParser.cs" />
     <Compile Include="Plugin.cs" />
     <Compile Include="Core\SqlInternalLogger.cs" />
     <Compile Include="Core\SqlStatistic.cs" />

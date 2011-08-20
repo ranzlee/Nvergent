@@ -56,12 +56,12 @@ namespace NHibernate.Glimpse
             context.Response.Write("<h2 style='font-family: arial;'>NHibernate.Glimpse</h2>");
             context.Response.Write("<br />");
             context.Response.Write("<div style='font-family: arial;'>This plugin attempts to be as unobtrusive to NHibernate as possible. ");
-            context.Response.Write("Therefore, the only NHibernate configuration automatically set is the ");
+            context.Response.Write("The only NHibernate configuration automatically overridden is the ");
             context.Response.Write("LoggerFactory (in appsettings). This was primarily to avoid a dependency on Log4Net. ");
-            context.Response.Write("By default, SQL and detail logging is provided, but other profile data can ");
-            context.Response.Write("obtained with some minor configuration options and API calls.</div>");
+            context.Response.Write("By default, SQL and detail logging is provided, but other profile data is ");
+            context.Response.Write("available with some minor configuration options and API calls.</div>");
             context.Response.Write("<br />");
-            context.Response.Write("<div style='font-family: arial;'>Add this NHibernate property for proper SQL formatting.</div>");
+            context.Response.Write("<div style='font-family: arial;'>Add this NHibernate property to format SQL.</div>");
             context.Response.Write("<div style='font-family: courier;'>&lt;property name=\"format_sql\"&gt;true&lt;/property&gt;</div>");
             context.Response.Write("<br/>");
             context.Response.Write("<div style='font-family: arial;'>Add this listener for entity load statistics. The listener extends from the default post load listener.</div>");
@@ -75,7 +75,7 @@ namespace NHibernate.Glimpse
             context.Response.Write("<div style='font-family: arial;'>You also need to register the factory after building it.</div>");
             context.Response.Write("<div style='font-family: courier;'>NHibernate.Glimpse.Plugin.RegisterSessionFactory(YourSessionFactory);<div>");
             context.Response.Write("<br />");
-            context.Response.Write("<div style='font-family: arial;'>For persistent logging (i.e. so that the log is not reset after each request), set this property.</div>");
+            context.Response.Write("<div style='font-family: arial;'>For persistent logging (i.e. so that the log is not reset after each request), set this property in code.</div>");
             context.Response.Write("<div style='font-family: courier;'>NHibernate.Glimpse.Plugin.KeepLogHistory = true;</div>");
             context.Response.Write("<br />");
             context.Response.Write("</body></html>");
@@ -95,8 +95,8 @@ namespace NHibernate.Glimpse
             }
             if (info == null) info = new RequestDebugInfo();
             context.Response.Write(string.Format("<html><head>{0}</head><body>{1}</body></html>",
-                                                 Core.Profiler.GetCss(),
-                                                 Core.Profiler.GetDebugInfo(info)));
+                                                 Core.SqlLogParser.GetCss(),
+                                                 Core.SqlLogParser.GetDebugInfo(info)));
         }
 
         private static void ShowLog(HttpContext context, int index)
