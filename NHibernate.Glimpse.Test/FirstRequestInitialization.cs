@@ -39,7 +39,7 @@ namespace NHibernate.Glimpse.Test
                 
                 MvcApplication.SessionFactory = config.BuildSessionFactory();
                 Plugin.RegisterSessionFactory(MvcApplication.SessionFactory);
-                //Plugin.KeepLogHistory = false;
+                Plugin.KeepLogHistory = true;
 
                 _initializedAlready = true;
             }

@@ -11,7 +11,7 @@ using NHibernate.Impl;
 namespace NHibernate.Glimpse
 {
     [GlimpsePlugin(SessionRequired = true, ShouldSetupInInit = true)]
-    public class Plugin : IGlimpsePlugin
+    public class Plugin : IGlimpsePlugin, IProvideGlimpseHelp
     {
         private static readonly object Lock = new object();
         internal static readonly IList<ISessionFactory> SessionFactories = new List<ISessionFactory>(); 
@@ -29,58 +29,22 @@ namespace NHibernate.Glimpse
             if (context == null) return string.Empty;
             var path = (string.IsNullOrWhiteSpace(context.Request.ApplicationPath))
                                ? string.Empty
-                               : context.Request.ApplicationPath.TrimEnd(new[] {'/'});
-            var cookie = context.Request.Cookies[GlimpseCookie];
-            if (cookie == null)
-            {
-                cookie = new HttpCookie(GlimpseCookie, Guid.NewGuid().ToString()) { HttpOnly = true };
-                context.Request.Cookies.Add(cookie);
-            }
-            var ignoreResponse = context.Items[IngnoreResponseKey];
-            if (ignoreResponse == null || !bool.Parse(ignoreResponse.ToString()))
-            {
-                context.Response.Cookies.Add(cookie);
-            }
+                               : context.Request.ApplicationPath.TrimEnd(new[] { '/' });
+            var cookie = GetCookie(context);
             var stat = Core.Profiler.Transform(context);
             if (stat == null) return string.Empty;
             var stats = Statistics.GetOrAdd(cookie.Value, new List<RequestDebugInfo>());
             var log = (context.Items[GlimpseLogKey] == null) ? new List<string>() : (IList<string>)context.Items[GlimpseLogKey];
             if (log == null) return string.Empty;
             var logs = Logs.GetOrAdd(cookie.Value, new List<IList<string>>());
-            if (!KeepLogHistory)
-            {
-                if (context.Session == null || context.Session.Mode == SessionStateMode.Off)
-                {
-                    stats.Clear();
-                    logs.Clear();
-                }
-                else
-                {
-                    if (context.Session[IsBeingRedirectedKey] == null)
-                    {
-                        stats.Clear();
-                        logs.Clear();
-                    }
-                    else
-                    {
-                        context.Session[IsBeingRedirectedKey] = null;
-                    }
-                    if (context.Response.IsRequestBeingRedirected)
-                    {
-                        context.Session[IsBeingRedirectedKey] = true;
-                    }
-                }
-            }
+            ProcessTransientLog(context, stats, logs);
             stats.Add(stat);
             logs.Add(log);
             var data = new List<object[]>();
             var columns = new List<object> { "Request", "Selects", "Inserts", "Updates", "Deletes", "Batch Commands" };
-            if (SessionContext.GetStatistics().Count > 0)
-            {
-                columns.Add("Entities Loaded");
-            }
+            if (SessionContext.GetStatistics().Count > 0) columns.Add("Entities Loaded");
             columns.Add("SQL");
-            columns.Add("Debug");
+            columns.Add("Details");
             data.Add(columns.ToArray());
             var i = stats.Count - 1;
             foreach (var item in stats.Reverse())
@@ -99,7 +63,7 @@ namespace NHibernate.Glimpse
                     values.Add(item.EntitiesLoaded);
                 }
                 values.Add(string.Format("!<a href='{0}/nhibernate.glimpse.axd?key={1}&show=sql' target='_blank'>SQL</a>!", path, item.GlimpseKey));
-                values.Add(string.Format("!<a href='{0}/nhibernate.glimpse.axd?key={1}&show=debug&index={2}' target='_blank'>Debug [{3}]</a>!", path, item.GlimpseKey, i, logs[i].Count - 1));
+                values.Add(string.Format("!<a href='{0}/nhibernate.glimpse.axd?key={1}&show=debug&index={2}' target='_blank'>Details</a>!", path, item.GlimpseKey, i));
                 data.Add(values.ToArray());
                 i -= 1;
             }
@@ -147,18 +111,8 @@ namespace NHibernate.Glimpse
                     factoryHeader = new object[] { string.Format("Factory: {0}", (impl == null) ? string.Empty : impl.Uuid), factoryData.ToArray() };
                 }    
             }
-
-            //var statisticsControl = new object[] { "Statistics", string.Format("!<a href='{0}/nhibernate.glimpse.axd?key=clearstats'>Clear</a>!", path) };
-
             var mainStatisticsData = new object[] { "Statistics", factoryHeader };
-            //var mainStatisticsData = new object[] { statisticsControl, factoryHeader };
-
-
-            //var logControl = new object[] { "Log", string.Format("!<a href='{0}/nhibernate.glimpse.axd?key=clearlog'>Clear</a>!", path) };
-
             var mainLogData = new object[] { "Log", data };
-            //var mainLogData = new object[] { logControl, data };
-            
             var mainHeader = new object[] { "Key", "Value" };
             var main = new object[] { mainHeader, mainStatisticsData, mainLogData };
             return main;
@@ -188,12 +142,58 @@ namespace NHibernate.Glimpse
             }
         }
 
-        private static bool _keepLogHistory = true;
-        
-        public static bool KeepLogHistory
+        public static bool KeepLogHistory { get; set; }
+
+        private static HttpCookie GetCookie(HttpContextBase context)
         {
-            get { return _keepLogHistory; }
-            set { _keepLogHistory = value; }
+            var cookie = context.Request.Cookies[GlimpseCookie];
+            if (cookie == null)
+            {
+                cookie = new HttpCookie(GlimpseCookie, Guid.NewGuid().ToString()) { HttpOnly = true };
+                context.Request.Cookies.Add(cookie);
+            }
+            var ignoreResponse = context.Items[IngnoreResponseKey];
+            if (ignoreResponse == null || !bool.Parse(ignoreResponse.ToString()))
+            {
+                context.Response.Cookies.Add(cookie);
+            }
+            return cookie;
+        }
+
+        private static void ProcessTransientLog(HttpContextBase context, ICollection<RequestDebugInfo> stats, ICollection<IList<string>> logs)
+        {
+            if (KeepLogHistory) return;
+            if (context.Session == null || context.Session.Mode == SessionStateMode.Off)
+            {
+                stats.Clear();
+                logs.Clear();
+                return;
+            }
+            if (context.Request.Params["x-requested-with"] != null && context.Request.Params["x-requested-with"].ToUpper().Trim() == "XMLHTTPREQUEST")
+            {
+                return;
+            }
+            if (context.Session[IsBeingRedirectedKey] == null)
+            {
+                stats.Clear();
+                logs.Clear();
+            }
+            else
+            {
+                context.Session[IsBeingRedirectedKey] = null;
+            }
+            if (context.Response.IsRequestBeingRedirected) context.Session[IsBeingRedirectedKey] = true;
+        }
+
+        public string HelpUrl
+        {
+            get
+            {
+                var path = (string.IsNullOrWhiteSpace(HttpContext.Current.Request.ApplicationPath))
+                               ? string.Empty
+                               : HttpContext.Current.Request.ApplicationPath.TrimEnd(new[] { '/' });
+                return string.Format("{0}/nhibernate.glimpse.axd?key=help", path);
+            }
         }
     }
 }

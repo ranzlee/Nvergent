@@ -80,7 +80,6 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="App_Readme\glimpse.readme.txt" />
-    <Content Include="App_Readme\nhibernate.glimpse.readme.txt" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config">
