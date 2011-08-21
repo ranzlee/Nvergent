@@ -13,7 +13,7 @@ namespace NHibernate.Glimpse.Test.Controllers
 
         public ActionResult ExecuteCommands()
         {
-            DoCommands();
+            DoCommands(0);
             return View("Index");
         }
 
@@ -29,11 +29,11 @@ namespace NHibernate.Glimpse.Test.Controllers
         [HttpPost]
         public ActionResult ExecuteCommandsAsync()
         {
-            DoCommands();
+            DoCommands(0);
             return Content(string.Empty);
         }
 
-        private void DoCommands()
+        private void DoCommands(int id)
         {
             var c = new Cat("meow") 
             { BirthDate = DateTime.Now.AddYears(-2), Gender = "Female", Name = "Fluffy" };

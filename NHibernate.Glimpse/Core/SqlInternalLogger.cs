@@ -1,24 +1,51 @@
 using System;
 using System.Collections.Generic;
+using System.Reflection;
 using System.Web;
+using Glimpse.Core.Extensibility;
 
 namespace NHibernate.Glimpse.Core
 {
     internal class SqlInternalLogger : IInternalLogger
     {
+        private static readonly Assembly ThisAssem = typeof(SqlInternalLogger).Assembly;
+        private static readonly Assembly NhAssem = typeof(IInternalLogger).Assembly;
+        private static readonly Assembly GlimpseAssem = typeof(IGlimpsePlugin).Assembly;
+
         public void Debug(object message)
         {
             if (message == null) return;
             if (!LoggerFactory.LogRequest()) return;
             var context = HttpContext.Current;
             if (context == null) return;
+
+            var stackFrames = new System.Diagnostics.StackTrace().GetFrames();
+            MethodBase method = null;
+            if (stackFrames != null)
+            {
+                foreach (var frame in stackFrames)
+                {
+                    var assem = frame.GetMethod().DeclaringType.Assembly;
+                    if (assem == ThisAssem) continue;
+                    if (assem == NhAssem) continue;
+                    if (assem == GlimpseAssem) continue;
+                    method = frame.GetMethod();
+                    break;
+                }
+            }
             var l = (IList<SqlStatistic>)context.Items[Plugin.GlimpseSqlStatsKey];
             if (l == null)
             {
                 l = new List<SqlStatistic>();
                 context.Items.Add(Plugin.GlimpseSqlStatsKey, l);
             }
-            l.Add(new SqlStatistic { Sql = message.ToString(), Timestamp = DateTime.Now });
+            l.Add(new SqlStatistic
+                      {
+                          Sql = message.ToString(),
+                          Timestamp = DateTime.Now,
+                          Member = (method == null) ? string.Empty : method.DeclaringType.ToString(),
+                          Method = (method == null) ? string.Empty : method.ToString()
+                      });
         }
 
         public void Error(object message)

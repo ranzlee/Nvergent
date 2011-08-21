@@ -35,7 +35,13 @@ namespace NHibernate.Glimpse.Core
                 if (detail.StartsWith("insert", StringComparison.OrdinalIgnoreCase)) inserts++;
                 if (detail.StartsWith("batch commands:", StringComparison.OrdinalIgnoreCase)) batchCommands++;
                 detail = string.Format("<pre class='brush: sql'>{0}</pre>", detail.Replace(", @p", ",\n\t@p"));
-                info.Details.Add(new DebugInfoDetail{Description = detail, Timestamp = loggingEvent.Timestamp });
+                info.Details.Add(new DebugInfoDetail
+                                     {
+                                         Description = detail,
+                                         Timestamp = loggingEvent.Timestamp,
+                                         Member = loggingEvent.Member,
+                                         Method = loggingEvent.Method
+                                     });
             }
             info.Selects = selects;
             info.Inserts = inserts;
@@ -168,13 +174,16 @@ namespace NHibernate.Glimpse.Core
                 sb.Append(info.EntityDetails);
                 foreach (var detail in info.Details)
                 {
-                    sb.AppendFormat("<div class='detail'>{1}</div><div class='metric'>{0}</div>",
-                                    string.Format("{0}.{1}.{2}.{3}",
-                                                    detail.Timestamp.Hour.ToString().PadLeft(2, '0'),
-                                                    detail.Timestamp.Minute.ToString().PadLeft(2, '0'),
-                                                    detail.Timestamp.Second.ToString().PadLeft(2, '0'),
-                                                    detail.Timestamp.Millisecond.ToString().PadLeft(3, '0')),
-                                    detail.Description);
+                    sb.AppendFormat(
+                        "<div class='detail'>{0}</div><div class='stackFrame'>{1} -> {2} @{3}</div>",
+                        detail.Description,
+                        detail.Member,
+                        detail.Method,
+                        string.Format("{0}.{1}.{2}.{3}",
+                                      detail.Timestamp.Hour.ToString().PadLeft(2, '0'),
+                                      detail.Timestamp.Minute.ToString().PadLeft(2, '0'),
+                                      detail.Timestamp.Second.ToString().PadLeft(2, '0'),
+                                      detail.Timestamp.Millisecond.ToString().PadLeft(3, '0')));
                 }
             }
             return sb.ToString();

@@ -11,7 +11,7 @@ using NHibernate.Impl;
 namespace NHibernate.Glimpse
 {
     [GlimpsePlugin(SessionRequired = true, ShouldSetupInInit = true)]
-    public class Plugin : IGlimpsePlugin, IProvideGlimpseHelp//, IProvideGlimpseStructuredLayout
+    public class Plugin : IGlimpsePlugin, IProvideGlimpseHelp
     {
         private static readonly object Lock = new object();
         internal static readonly IList<ISessionFactory> SessionFactories = new List<ISessionFactory>(); 
@@ -31,7 +31,7 @@ namespace NHibernate.Glimpse
                                ? string.Empty
                                : context.Request.ApplicationPath.TrimEnd(new[] { '/' });
             var cookie = GetCookie(context);
-            var stat = Core.SqlLogParser.Transform(context);
+            var stat = SqlLogParser.Transform(context);
             if (stat == null) return string.Empty;
             var stats = Statistics.GetOrAdd(cookie.Value, new List<RequestDebugInfo>());
             var log = (context.Items[GlimpseLogKey] == null) ? new List<string>() : (IList<string>)context.Items[GlimpseLogKey];
@@ -142,6 +142,9 @@ namespace NHibernate.Glimpse
             }
         }
 
+        /// <summary>
+        /// true will keep the request log persistent as long as Glimpse is active. Default is false.
+        /// </summary>
         public static bool KeepLogHistory { get; set; }
 
         private static HttpCookie GetCookie(HttpContextBase context)
@@ -193,25 +196,6 @@ namespace NHibernate.Glimpse
                                ? string.Empty
                                : HttpContext.Current.Request.ApplicationPath.TrimEnd(new[] { '/' });
                 return string.Format("{0}/nhibernate.glimpse.axd?key=help", path);
-            }
-        }
-
-        public GlimpseStructuredLayout StructuredLayout
-        {
-            get
-            {
-                var cell = new GlimpseStructuredLayoutCell();
-                cell.Data = "select * from entity where id = @id";
-                //cell.Prefix = "my prefix";
-                cell.IsCode = true;
-                cell.CodeType = "SQL";
-                //cell.Structure = "<a href='#'>Hello World</a>";
-                cell.ClassName = "glimpse-trigger";
-                var section = new GlimpseStructuredLayoutSection();
-                section.Add(cell);
-                var layout = new GlimpseStructuredLayout();
-                layout.Add(section);
-                return layout;
             }
         }
     }
