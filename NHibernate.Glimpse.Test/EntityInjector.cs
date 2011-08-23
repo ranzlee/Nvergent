@@ -1,4 +1,3 @@
-using System;
 using NHibernate.DependencyInjection;
 using NHibernate.Glimpse.Test.Models;
 

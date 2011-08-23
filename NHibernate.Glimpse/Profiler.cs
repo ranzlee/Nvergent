@@ -95,8 +95,8 @@ namespace NHibernate.Glimpse
             }
             if (info == null) info = new RequestDebugInfo();
             context.Response.Write(string.Format("<html><head>{0}</head><body>{1}</body></html>",
-                                                 Core.SqlLogParser.GetCss(),
-                                                 Core.SqlLogParser.GetDebugInfo(info)));
+                                                 SqlLogParser.GetCss(),
+                                                 SqlLogParser.GetDebugInfo(info)));
         }
 
         private static void ShowLog(HttpContext context, int index)

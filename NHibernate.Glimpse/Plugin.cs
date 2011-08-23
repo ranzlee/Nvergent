@@ -163,29 +163,39 @@ namespace NHibernate.Glimpse
             return cookie;
         }
 
+        internal static bool IsAjax(HttpContextBase context)
+        {
+            var request = context.Request;
+            if (request["X-Requested-With"] == "XMLHttpRequest")
+                return true;
+            if (request.Headers != null)
+                return request.Headers["X-Requested-With"] == "XMLHttpRequest";
+            return false;
+        }
+
         private static void ProcessTransientLog(HttpContextBase context, ICollection<RequestDebugInfo> stats, ICollection<IList<string>> logs)
         {
             if (KeepLogHistory) return;
-            if (context.Session == null || context.Session.Mode == SessionStateMode.Off)
+            if (context.Session == null || context.Session.Mode == SessionStateMode.Off) return;
+            if (IsAjax(context)) return;
+            if (context.Response.IsRequestBeingRedirected)
             {
                 stats.Clear();
                 logs.Clear();
+                context.Session[IsBeingRedirectedKey] = true;
                 return;
             }
-            if (context.Request.Params["x-requested-with"] != null && context.Request.Params["x-requested-with"].ToUpper().Trim() == "XMLHTTPREQUEST")
-            {
-                return;
-            }
-            if (context.Session[IsBeingRedirectedKey] == null)
-            {
-                stats.Clear();
-                logs.Clear();
-            }
-            else
+            bool redirected;
+            if (context.Session[IsBeingRedirectedKey] != null
+                && bool.TryParse(context.Session[IsBeingRedirectedKey].ToString(), out redirected)
+                && redirected)
             {
                 context.Session[IsBeingRedirectedKey] = null;
+                return;
             }
-            if (context.Response.IsRequestBeingRedirected) context.Session[IsBeingRedirectedKey] = true;
+            stats.Clear();
+            logs.Clear();
+            context.Session[IsBeingRedirectedKey] = null;
         }
 
         public string HelpUrl
