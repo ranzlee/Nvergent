@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Threading;
@@ -39,8 +40,7 @@ namespace NHibernate.Glimpse.Core
                                      {
                                          Description = detail,
                                          Timestamp = loggingEvent.Timestamp,
-                                         Member = loggingEvent.Member,
-                                         Method = loggingEvent.Method
+                                         StackFrames = loggingEvent.StackFrames
                                      });
             }
             info.Selects = selects;
@@ -174,16 +174,33 @@ namespace NHibernate.Glimpse.Core
                 sb.Append(info.EntityDetails);
                 foreach (var detail in info.Details)
                 {
+                    var id = Guid.NewGuid().ToString();
                     sb.AppendFormat(
-                        "<div class='detail'>{0}</div><div class='stackFrame'>{1} -> {2} @{3}</div>",
+                        "<div class='detail'>{0}</div><div class='stackFrame'><a href=\"javascript:toggle('{1}');\" class='entityLink'>{2} @ {3}</a></div>",
                         detail.Description,
-                        detail.Member,
-                        detail.Method,
+                        id,
+                        (detail.StackFrames.Count > 0)
+                            ? detail.StackFrames.First()
+                            : string.Empty,
                         string.Format("{0}.{1}.{2}.{3}",
                                       detail.Timestamp.Hour.ToString().PadLeft(2, '0'),
                                       detail.Timestamp.Minute.ToString().PadLeft(2, '0'),
                                       detail.Timestamp.Second.ToString().PadLeft(2, '0'),
                                       detail.Timestamp.Millisecond.ToString().PadLeft(3, '0')));
+                    if (detail.StackFrames.Count > 1)
+                    {
+                        sb.AppendFormat("<div id='{0}' style='display : none'>", id);
+                        var style = "stackFrame";
+                        foreach (var frame in detail.StackFrames.Skip(1))
+                        {
+                            style = (style == "stackFrame")
+                                        ? "altStackFrame"
+                                        : "stackFrame";
+                            sb.AppendFormat("<div class='{0}'>{1}</div>", style, frame);
+                        }
+                        sb.Append("</div>");
+                    }
+                    
                 }
             }
             return sb.ToString();

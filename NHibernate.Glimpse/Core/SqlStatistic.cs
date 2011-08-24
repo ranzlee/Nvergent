@@ -1,15 +1,19 @@
 using System;
+using System.Collections.Generic;
 
 namespace NHibernate.Glimpse.Core
 {
     internal class SqlStatistic
     {
-        public string Sql { get; set; }
+        internal SqlStatistic()
+        {
+            StackFrames = new List<string>();
+        }
 
-        public DateTime Timestamp { get; set; }
+        internal string Sql { get; set; }
 
-        public string Method { get; set; }
+        internal DateTime Timestamp { get; set; }
 
-        public string Member { get; set; }
+        internal IList<string> StackFrames { get; set; }
     }
 }

@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using System.Web;
 using Glimpse.Core.Extensibility;
@@ -20,17 +21,24 @@ namespace NHibernate.Glimpse.Core
             if (context == null) return;
 
             var stackFrames = new System.Diagnostics.StackTrace().GetFrames();
-            MethodBase method = null;
+            var methods = new List<MethodBase>();
             if (stackFrames != null)
             {
                 foreach (var frame in stackFrames)
                 {
-                    var assem = frame.GetMethod().DeclaringType.Assembly;
-                    if (assem == ThisAssem) continue;
-                    if (assem == NhAssem) continue;
-                    if (assem == GlimpseAssem) continue;
-                    method = frame.GetMethod();
-                    break;
+                    var meth = frame.GetMethod();
+                    var type = meth.DeclaringType;
+                    // ReSharper disable ConditionIsAlwaysTrueOrFalse
+                    //this can happen for emitted types
+                    if (type != null)
+                    // ReSharper restore ConditionIsAlwaysTrueOrFalse
+                    {
+                        var assem = type.Assembly;
+                        if (assem == ThisAssem) continue;
+                        if (assem == NhAssem) continue;
+                        if (assem == GlimpseAssem) continue;    
+                    }
+                    methods.Add(frame.GetMethod());
                 }
             }
             var l = (IList<SqlStatistic>)context.Items[Plugin.GlimpseSqlStatsKey];
@@ -39,12 +47,16 @@ namespace NHibernate.Glimpse.Core
                 l = new List<SqlStatistic>();
                 context.Items.Add(Plugin.GlimpseSqlStatsKey, l);
             }
+            // ReSharper disable ConditionIsAlwaysTrueOrFalse
+            var frames = methods
+                .Select(method => string.Format("{0} -> {1}", (method.DeclaringType == null) ? "DYNAMIC" : method.DeclaringType.ToString(), method))
+                .ToList();
+            // ReSharper restore ConditionIsAlwaysTrueOrFalse
             l.Add(new SqlStatistic
                       {
                           Sql = message.ToString(),
                           Timestamp = DateTime.Now,
-                          Member = (method == null) ? string.Empty : method.DeclaringType.ToString(),
-                          Method = (method == null) ? string.Empty : method.ToString()
+                          StackFrames = frames
                       });
         }
 

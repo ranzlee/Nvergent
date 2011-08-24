@@ -1,15 +1,19 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace NHibernate.Glimpse.Core
 {
     internal class DebugInfoDetail
     {
-        public DateTime Timestamp { get; set; }
+        internal DebugInfoDetail()
+        {
+            StackFrames = new List<string>();
+        }
 
-        public string Description { get; set; }
+        internal DateTime Timestamp { get; set; }
 
-        public string Method { get; set; }
+        internal string Description { get; set; }
 
-        public string Member { get; set; }
+        internal IList<string> StackFrames { get; set; }
     }
 }

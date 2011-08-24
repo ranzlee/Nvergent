@@ -62,3 +62,17 @@
     text-decoration: none;
     color: #0099FF;
 }
+
+.stackFrame
+{
+    background-color: #FFFFFF;
+    font-family: Consolas;
+    font-size: 12px;
+}
+
+.altStackFrame
+{
+    background-color: #FFFF99;
+    font-family: Consolas;
+    font-size: 12px;
+}

@@ -75,9 +75,6 @@ namespace NHibernate.Glimpse
             context.Response.Write("<div style='font-family: arial;'>You also need to register the factory after building it.</div>");
             context.Response.Write("<div style='font-family: courier;'>NHibernate.Glimpse.Plugin.RegisterSessionFactory(YourSessionFactory);<div>");
             context.Response.Write("<br />");
-            context.Response.Write("<div style='font-family: arial;'>For persistent logging (i.e. so that the log is not reset after each request), set this property in code.</div>");
-            context.Response.Write("<div style='font-family: courier;'>NHibernate.Glimpse.Plugin.KeepLogHistory = true;</div>");
-            context.Response.Write("<br />");
             context.Response.Write("</body></html>");
         }
 

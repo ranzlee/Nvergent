@@ -3,14 +3,13 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
-using System.Web.SessionState;
 using Glimpse.Core.Extensibility;
 using NHibernate.Glimpse.Core;
 using NHibernate.Impl;
 
 namespace NHibernate.Glimpse
 {
-    [GlimpsePlugin(SessionRequired = true, ShouldSetupInInit = true)]
+    [GlimpsePlugin]
     public class Plugin : IGlimpsePlugin, IProvideGlimpseHelp
     {
         private static readonly object Lock = new object();
@@ -37,7 +36,6 @@ namespace NHibernate.Glimpse
             var log = (context.Items[GlimpseLogKey] == null) ? new List<string>() : (IList<string>)context.Items[GlimpseLogKey];
             if (log == null) return string.Empty;
             var logs = Logs.GetOrAdd(cookie.Value, new List<IList<string>>());
-            ProcessTransientLog(context, stats, logs);
             stats.Add(stat);
             logs.Add(log);
             var data = new List<object[]>();
@@ -46,27 +44,22 @@ namespace NHibernate.Glimpse
             columns.Add("SQL");
             columns.Add("Details");
             data.Add(columns.ToArray());
-            var i = stats.Count - 1;
-            foreach (var item in stats.Reverse())
+            var values = new List<object>
+                        {
+                            stat.Url,
+                            stat.Selects,
+                            stat.Inserts,
+                            stat.Updates,
+                            stat.Deletes,
+                            stat.Batch
+                        };
+            if (SessionContext.GetStatistics().Count > 0)
             {
-                var values = new List<object>
-                            {
-                                item.Url,
-                                item.Selects,
-                                item.Inserts,
-                                item.Updates,
-                                item.Deletes,
-                                item.Batch
-                            };
-                if (SessionContext.GetStatistics().Count > 0)
-                {
-                    values.Add(item.EntitiesLoaded);
-                }
-                values.Add(string.Format("!<a href='{0}/nhibernate.glimpse.axd?key={1}&show=sql' target='_blank'>SQL</a>!", path, item.GlimpseKey));
-                values.Add(string.Format("!<a href='{0}/nhibernate.glimpse.axd?key={1}&show=debug&index={2}' target='_blank'>Details</a>!", path, item.GlimpseKey, i));
-                data.Add(values.ToArray());
-                i -= 1;
+                values.Add(stat.EntitiesLoaded);
             }
+            values.Add(string.Format("!<a href='{0}/nhibernate.glimpse.axd?key={1}&show=sql' target='_blank'>SQL</a>!", path, stat.GlimpseKey));
+            values.Add(string.Format("!<a href='{0}/nhibernate.glimpse.axd?key={1}&show=debug&index={2}' target='_blank'>Details</a>!", path, stat.GlimpseKey, stats.Count() - 1));
+            data.Add(values.ToArray());
             object[] factoryHeader = null;
             var factoryData = new List<object> {new object[] {"Key", "Value"}};
             lock (Lock)
@@ -114,7 +107,7 @@ namespace NHibernate.Glimpse
             var mainStatisticsData = new object[] { "Statistics", factoryHeader };
             var mainLogData = new object[] { "Log", data };
             var mainHeader = new object[] { "Key", "Value" };
-            var main = new object[] { mainHeader, mainStatisticsData, mainLogData };
+            var main = new object[] { mainHeader, mainLogData, mainStatisticsData };
             return main;
         }
 
@@ -130,7 +123,6 @@ namespace NHibernate.Glimpse
 
         /// <summary>
         /// Register an ISessionFactory for statistics logging
-        /// NOTE: This requires the property generate_statistics = true
         /// </summary>
         /// <param name="sessionFactory">ISessionFactory</param>
         public static void RegisterSessionFactory(ISessionFactory sessionFactory)
@@ -141,11 +133,6 @@ namespace NHibernate.Glimpse
                 if (!SessionFactories.Contains(sessionFactory)) SessionFactories.Add(sessionFactory);    
             }
         }
-
-        /// <summary>
-        /// true will keep the request log persistent as long as Glimpse is active. Default is false.
-        /// </summary>
-        public static bool KeepLogHistory { get; set; }
 
         private static HttpCookie GetCookie(HttpContextBase context)
         {
@@ -161,41 +148,6 @@ namespace NHibernate.Glimpse
                 context.Response.Cookies.Add(cookie);
             }
             return cookie;
-        }
-
-        internal static bool IsAjax(HttpContextBase context)
-        {
-            var request = context.Request;
-            if (request["X-Requested-With"] == "XMLHttpRequest")
-                return true;
-            if (request.Headers != null)
-                return request.Headers["X-Requested-With"] == "XMLHttpRequest";
-            return false;
-        }
-
-        private static void ProcessTransientLog(HttpContextBase context, ICollection<RequestDebugInfo> stats, ICollection<IList<string>> logs)
-        {
-            if (KeepLogHistory) return;
-            if (context.Session == null || context.Session.Mode == SessionStateMode.Off) return;
-            if (IsAjax(context)) return;
-            if (context.Response.IsRequestBeingRedirected)
-            {
-                stats.Clear();
-                logs.Clear();
-                context.Session[IsBeingRedirectedKey] = true;
-                return;
-            }
-            bool redirected;
-            if (context.Session[IsBeingRedirectedKey] != null
-                && bool.TryParse(context.Session[IsBeingRedirectedKey].ToString(), out redirected)
-                && redirected)
-            {
-                context.Session[IsBeingRedirectedKey] = null;
-                return;
-            }
-            stats.Clear();
-            logs.Clear();
-            context.Session[IsBeingRedirectedKey] = null;
         }
 
         public string HelpUrl
