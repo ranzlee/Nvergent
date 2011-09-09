@@ -29,19 +29,29 @@ namespace NHibernate.Glimpse.Core
             if (url != null) info.Url = url.AbsolutePath;
             foreach (var loggingEvent in events)
             {
-                var detail = loggingEvent.Sql.TrimStart(' ', '\n', '\r');
-                if (detail.StartsWith("select", StringComparison.OrdinalIgnoreCase)) selects++;
-                if (detail.StartsWith("update", StringComparison.OrdinalIgnoreCase)) updates++;
-                if (detail.StartsWith("delete", StringComparison.OrdinalIgnoreCase)) deletes++;
-                if (detail.StartsWith("insert", StringComparison.OrdinalIgnoreCase)) inserts++;
-                if (detail.StartsWith("batch commands:", StringComparison.OrdinalIgnoreCase)) batchCommands++;
-                detail = string.Format("<pre class='brush: sql'>{0}</pre>", detail.Replace(", @p", ",\n\t@p"));
-                info.Details.Add(new DebugInfoDetail
-                                     {
-                                         Description = detail,
-                                         Timestamp = loggingEvent.Timestamp,
-                                         StackFrames = loggingEvent.StackFrames
-                                     });
+                if (!string.IsNullOrWhiteSpace(loggingEvent.Sql))
+                {
+                    var detail = loggingEvent.Sql.TrimStart(' ', '\n', '\r');
+                    if (detail.StartsWith("select", StringComparison.OrdinalIgnoreCase)) selects++;
+                    if (detail.StartsWith("update", StringComparison.OrdinalIgnoreCase)) updates++;
+                    if (detail.StartsWith("delete", StringComparison.OrdinalIgnoreCase)) deletes++;
+                    if (detail.StartsWith("insert", StringComparison.OrdinalIgnoreCase)) inserts++;
+                    if (detail.StartsWith("batch commands:", StringComparison.OrdinalIgnoreCase)) batchCommands++;
+                    detail = string.Format("<pre class='brush: sql'>{0}</pre>", detail.Replace(", @p", ",\n\t@p"));
+                    info.Details.Add(new DebugInfoDetail
+                    {
+                        Description = detail,
+                        Timestamp = loggingEvent.Timestamp,
+                        StackFrames = loggingEvent.StackFrames
+                    });    
+                }
+                if (!string.IsNullOrWhiteSpace(loggingEvent.Metric))
+                {
+                    info.Details.Add(new DebugInfoDetail
+                    {
+                        Description = loggingEvent.Metric
+                    });
+                }
             }
             info.Selects = selects;
             info.Inserts = inserts;
@@ -176,13 +186,18 @@ namespace NHibernate.Glimpse.Core
                 {
                     var id = Guid.NewGuid().ToString();
                     sb.AppendFormat(
-                        "<div class='detail'>{0}</div><div class='stackFrame'><a href=\"javascript:toggle('{1}');\" class='entityLink'>{2} @ {3}</a></div>",
+                        "<div class='{0}'>{1}</div><div class='stackFrame'><a href=\"javascript:toggle('{2}');\" class='entityLink'>{3}{4}</a></div>",
+                        (detail.Timestamp == DateTime.MinValue)
+                            ? "metric"
+                            : "detail",
                         detail.Description,
                         id,
                         (detail.StackFrames.Count > 0)
                             ? detail.StackFrames.First()
                             : string.Empty,
-                        string.Format("{0}.{1}.{2}.{3}",
+                        (detail.Timestamp == DateTime.MinValue)
+                            ? string.Empty
+                            : string.Format(" @ {0}.{1}.{2}.{3}",
                                       detail.Timestamp.Hour.ToString().PadLeft(2, '0'),
                                       detail.Timestamp.Minute.ToString().PadLeft(2, '0'),
                                       detail.Timestamp.Second.ToString().PadLeft(2, '0'),

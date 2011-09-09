@@ -41,8 +41,8 @@ namespace NHibernate.Glimpse
             var data = new List<object[]>();
             var columns = new List<object> { "Request", "Selects", "Inserts", "Updates", "Deletes", "Batch Commands" };
             if (SessionContext.GetStatistics().Count > 0) columns.Add("Entities Loaded");
-            columns.Add("SQL");
             columns.Add("Details");
+            //columns.Add("Details");
             data.Add(columns.ToArray());
             var values = new List<object>
                         {
@@ -57,8 +57,8 @@ namespace NHibernate.Glimpse
             {
                 values.Add(stat.EntitiesLoaded);
             }
-            values.Add(string.Format("!<a href='{0}/nhibernate.glimpse.axd?key={1}&show=sql' target='_blank'>SQL</a>!", path, stat.GlimpseKey));
-            values.Add(string.Format("!<a href='{0}/nhibernate.glimpse.axd?key={1}&show=debug&index={2}' target='_blank'>Details</a>!", path, stat.GlimpseKey, stats.Count() - 1));
+            values.Add(string.Format("!<a href='{0}/nhibernate.glimpse.axd?key={1}&show=sql' target='_blank'>Launch</a>!", path, stat.GlimpseKey));
+            //values.Add(string.Format("!<a href='{0}/nhibernate.glimpse.axd?key={1}&show=debug&index={2}' target='_blank'>Details</a>!", path, stat.GlimpseKey, stats.Count() - 1));
             data.Add(values.ToArray());
             object[] factoryHeader = null;
             var factoryData = new List<object> {new object[] {"Key", "Value"}};

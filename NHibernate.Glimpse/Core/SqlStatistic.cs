@@ -12,6 +12,8 @@ namespace NHibernate.Glimpse.Core
 
         internal string Sql { get; set; }
 
+        internal string Metric { get; set; }
+
         internal DateTime Timestamp { get; set; }
 
         internal IList<string> StackFrames { get; set; }

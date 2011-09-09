@@ -58,7 +58,7 @@ namespace NHibernate.Glimpse
             context.Response.Write("<div style='font-family: arial;'>This plugin attempts to be as unobtrusive to NHibernate as possible. ");
             context.Response.Write("The only NHibernate configuration automatically overridden is the ");
             context.Response.Write("LoggerFactory (in appsettings). This was primarily to avoid a dependency on Log4Net. ");
-            context.Response.Write("By default, SQL and detail logging is provided, but other profile data is ");
+            context.Response.Write("By default, ADO.Net logging is provided, but other profile data is ");
             context.Response.Write("available with some minor configuration options and API calls.</div>");
             context.Response.Write("<br />");
             context.Response.Write("<div style='font-family: arial;'>Add this NHibernate property to format SQL.</div>");

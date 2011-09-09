@@ -1,78 +1,97 @@
 ﻿body
 {
-    margin: 0;
-    font-family: Arial;
-    font-size: 10px;
+	margin: 0;
+	font-family: Arial;
+	font-size: 10px;
 }
 
 .endpoint
 {
-    padding-top: 10px;
-    font-size: 12pt;
-    font-weight: bold;
-    color: #6666FF;
-    background-color: #E5E5E5;
-    border-bottom-style: solid;
-    border-bottom-width: 1px;
-    border-bottom-color: #808080;
+	padding-top: 10px;
+    padding-left: 5px;
+	font-size: 12pt;
+	font-weight: bold;
+	color: #6666FF;
+	background-color: #E5E5E5;
+	border-bottom-style: solid;
+	border-bottom-width: 1px;
+	border-bottom-color: #808080;
 }
 
 .oddentity
 {
-    background-color: #FFE1CE;
+    padding: 2px 10px 2px 10px;
+	background-color: #FFE1CE;
 }
 
 .evenentity
 {
-    background-color: #FFFFFF;
+    padding: 2px 10px 2px 10px;
+	background-color: #FFFFFF;
 }
 
 .detail
 {
-    border-top-style: dotted; 
-    border-top-width: 1px; 
-    border-top-color: #6699FF;
+    margin: 10px 10px 10px 10px;
+	border-top-style: dotted; 
+	border-top-width: 1px; 
+	border-top-color: #6699FF;
+}
+
+.metric
+{
+    margin: 10px 10px 10px 10px;
+	padding: 5px 5px 5px 5px;
+	background-color: #0099CC;
+	color: #FFFFFF;
+	font-weight: bold;
+	box-shadow: 0 1px 4px rgba(0, 0, 0, 0.15);
+	overflow: hidden;
+	-moz-border-radius: 5px 5px 5px 5px;
+	border-radius: 5px 5px 5px 5px;
 }
 
 .factory
 {
-    padding-top: 10px;
-    padding-bottom: 5px;
-    font-size: 12px;
-    font-weight: bold;
-    background-color: #F0F0F0;
-    color: #0099FF;
+	padding-top: 10px;
+	padding-bottom: 5px;
+	font-size: 12px;
+	font-weight: bold;
+	background-color: #F0F0F0;
+	color: #0099FF;
 }
 
 .entityheader
 {
-    padding-top: 10px;
-    background-color: #F0F0F0; 
+    padding: 10px 10px 10px 10px;
+	background-color: #F0F0F0; 
 }
 
 .entitylink
 {
-    font-size: 12px;
-    text-decoration: none;
-    color: #666666;
+	font-size: 12px;
+	text-decoration: none;
+	color: #666666;
 }
 
 .entitylink:hover
 {
-    text-decoration: none;
-    color: #0099FF;
+	text-decoration: none;
+	color: #0099FF;
 }
 
 .stackFrame
 {
-    background-color: #FFFFFF;
-    font-family: Consolas;
-    font-size: 12px;
+    margin: 3px 10px 3px 10px;
+	background-color: #FFFFFF;
+	font-family: Consolas;
+	font-size: 12px;
 }
 
 .altStackFrame
 {
-    background-color: #FFFF99;
-    font-family: Consolas;
-    font-size: 12px;
+    margin: 3px 10px 3px 10px;
+	background-color: #FFFF99;
+	font-family: Consolas;
+	font-size: 12px;
 }

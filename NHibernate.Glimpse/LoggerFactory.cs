@@ -7,6 +7,7 @@ namespace NHibernate.Glimpse
     public class LoggerFactory : ILoggerFactory
     {
         private readonly IInternalLogger _sqlLogger = new SqlInternalLogger();
+        private readonly IInternalLogger _batcherLogger = new BatcherInternalLogger();
         private readonly IInternalLogger _debugLogger = new DebugLogger();
         private readonly IInternalLogger _noLogger = new NoLogger();
 
@@ -20,18 +21,21 @@ namespace NHibernate.Glimpse
         {
             //GetLog().Add(string.Format("<div>{0}</div>", type));
             if (type == null) return _noLogger;
-            if (type == typeof(Impl.SessionImpl)
-                || type == typeof(Transaction.ITransactionFactory)
-                || type == typeof(Transaction.AdoTransaction)
-                || type == typeof(AdoNet.AbstractBatcher)
-                || type == typeof(AdoNet.ConnectionManager)
-                || type == typeof(AdoNet.NonBatchingBatcher)
-                || type == typeof(Driver.ReflectionBasedDriver)
-                || type == typeof(Driver.NDataReader)
-                || type == typeof(Driver.NHybridDataReader))
-            {
-                return _debugLogger;
-            }
+
+            if (type == typeof(AdoNet.AbstractBatcher)) return _batcherLogger;
+
+            //if (type == typeof(Impl.SessionImpl)
+            //    || type == typeof(Transaction.ITransactionFactory)
+            //    || type == typeof(Transaction.AdoTransaction)
+            //    //|| type == typeof(AdoNet.AbstractBatcher)
+            //    || type == typeof(AdoNet.ConnectionManager)
+            //    || type == typeof(AdoNet.NonBatchingBatcher)
+            //    || type == typeof(Driver.ReflectionBasedDriver)
+            //    || type == typeof(Driver.NDataReader)
+            //    || type == typeof(Driver.NHybridDataReader))
+            //{
+            //    return _debugLogger;
+            //}
             return _noLogger;
         }
 

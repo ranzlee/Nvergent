@@ -8,6 +8,7 @@ namespace NHibernate.Glimpse.Core
         internal DebugInfoDetail()
         {
             StackFrames = new List<string>();
+            Timestamp = DateTime.MinValue;
         }
 
         internal DateTime Timestamp { get; set; }

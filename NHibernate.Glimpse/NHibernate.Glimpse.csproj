@@ -47,6 +47,7 @@
     <Reference Include="System.Web" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Core\BatcherInternalLogger.cs" />
     <Compile Include="Core\DebugInfoDetail.cs" />
     <Compile Include="Core\DebugLogger.cs" />
     <Compile Include="Core\EntityLoadedStatistic.cs" />
