@@ -48,16 +48,17 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Core\BatcherInternalLogger.cs" />
+    <Compile Include="Core\ConnectionInternalLogger.cs" />
     <Compile Include="Core\DebugInfoDetail.cs" />
-    <Compile Include="Core\DebugLogger.cs" />
     <Compile Include="Core\EntityLoadedStatistic.cs" />
+    <Compile Include="Core\TransactionInternalLogger.cs" />
     <Compile Include="EntityPostLoadListener.cs" />
     <Compile Include="Core\NoLogger.cs" />
     <Compile Include="LoggerFactory.cs" />
     <Compile Include="Core\SqlLogParser.cs" />
     <Compile Include="Plugin.cs" />
     <Compile Include="Core\SqlInternalLogger.cs" />
-    <Compile Include="Core\SqlStatistic.cs" />
+    <Compile Include="Core\LogStatistic.cs" />
     <Compile Include="Profiler.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Core\RequestDebugInfo.cs" />

@@ -15,6 +15,12 @@ namespace NHibernate.Glimpse.Core
 
         internal string Description { get; set; }
 
+        internal bool IsSqlNotification { get; set; }
+
+        internal bool IsConnectionNotification { get; set; }
+
+        internal bool IsTransactionNotification { get; set; }
+
         internal IList<string> StackFrames { get; set; }
     }
 }

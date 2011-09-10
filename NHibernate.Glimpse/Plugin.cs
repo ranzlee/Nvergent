@@ -17,7 +17,6 @@ namespace NHibernate.Glimpse
         internal const string GlimpseCookie = "NHibernate.Glimpse";
         internal const string GlimpseSqlStatsKey = "NHibernate.Glimpse.Sql.Stats";
         internal const string GlimpseEntityLoadStatsKey = "NHibernate.Glimpse.Entity.Load.Stats";
-        internal const string GlimpseLogKey = "NHibernate.Glimpse.Log";
         internal const string IngnoreResponseKey = "NHibernate.Glimpse.Ignore.Response";
         internal const string IsBeingRedirectedKey = "NHibernate.Glimpse.Response.Redirect"; 
         internal static readonly ConcurrentDictionary<string, IList<RequestDebugInfo>> Statistics = new ConcurrentDictionary<string, IList<RequestDebugInfo>>();
@@ -33,16 +32,11 @@ namespace NHibernate.Glimpse
             var stat = SqlLogParser.Transform(context);
             if (stat == null) return string.Empty;
             var stats = Statistics.GetOrAdd(cookie.Value, new List<RequestDebugInfo>());
-            var log = (context.Items[GlimpseLogKey] == null) ? new List<string>() : (IList<string>)context.Items[GlimpseLogKey];
-            if (log == null) return string.Empty;
-            var logs = Logs.GetOrAdd(cookie.Value, new List<IList<string>>());
             stats.Add(stat);
-            logs.Add(log);
             var data = new List<object[]>();
             var columns = new List<object> { "Request", "Selects", "Inserts", "Updates", "Deletes", "Batch Commands" };
             if (SessionContext.GetStatistics().Count > 0) columns.Add("Entities Loaded");
             columns.Add("Details");
-            //columns.Add("Details");
             data.Add(columns.ToArray());
             var values = new List<object>
                         {
@@ -58,7 +52,6 @@ namespace NHibernate.Glimpse
                 values.Add(stat.EntitiesLoaded);
             }
             values.Add(string.Format("!<a href='{0}/nhibernate.glimpse.axd?key={1}&show=sql' target='_blank'>Launch</a>!", path, stat.GlimpseKey));
-            //values.Add(string.Format("!<a href='{0}/nhibernate.glimpse.axd?key={1}&show=debug&index={2}' target='_blank'>Details</a>!", path, stat.GlimpseKey, stats.Count() - 1));
             data.Add(values.ToArray());
             object[] factoryHeader = null;
             var factoryData = new List<object> {new object[] {"Key", "Value"}};

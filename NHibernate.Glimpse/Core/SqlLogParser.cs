@@ -22,7 +22,7 @@ namespace NHibernate.Glimpse.Core
             var deletes = 0;
             var inserts = 0;
             var batchCommands = 0;
-            var events = (IList<SqlStatistic>)HttpContext.Current.Items[Plugin.GlimpseSqlStatsKey];
+            var events = (IList<LogStatistic>)HttpContext.Current.Items[Plugin.GlimpseSqlStatsKey];
             if (events == null) return null;
             var url = context.Request.Url;
             var info = new RequestDebugInfo {GlimpseKey = Guid.NewGuid()};
@@ -42,7 +42,8 @@ namespace NHibernate.Glimpse.Core
                     {
                         Description = detail,
                         Timestamp = loggingEvent.Timestamp,
-                        StackFrames = loggingEvent.StackFrames
+                        StackFrames = loggingEvent.StackFrames,
+                        IsSqlNotification = true
                     });    
                 }
                 if (!string.IsNullOrWhiteSpace(loggingEvent.Metric))
@@ -50,6 +51,22 @@ namespace NHibernate.Glimpse.Core
                     info.Details.Add(new DebugInfoDetail
                     {
                         Description = loggingEvent.Metric
+                    });
+                }
+                if (!string.IsNullOrWhiteSpace(loggingEvent.ConnectionNotification))
+                {
+                    info.Details.Add(new DebugInfoDetail
+                    {
+                        Description = loggingEvent.ConnectionNotification,
+                        IsConnectionNotification = true
+                    });
+                }
+                if (!string.IsNullOrWhiteSpace(loggingEvent.TransactionNotification))
+                {
+                    info.Details.Add(new DebugInfoDetail
+                    {
+                        Description = loggingEvent.TransactionNotification,
+                        IsTransactionNotification = true
                     });
                 }
             }
@@ -187,9 +204,13 @@ namespace NHibernate.Glimpse.Core
                     var id = Guid.NewGuid().ToString();
                     sb.AppendFormat(
                         "<div class='{0}'>{1}</div><div class='stackFrame'><a href=\"javascript:toggle('{2}');\" class='entityLink'>{3}{4}</a></div>",
-                        (detail.Timestamp == DateTime.MinValue)
-                            ? "metric"
-                            : "detail",
+                        (detail.IsSqlNotification)
+                            ? "detail" 
+                            : (detail.IsConnectionNotification) 
+                                ? "connection" 
+                                : (detail.IsTransactionNotification) 
+                                    ? "transaction" 
+                                    : "metric",
                         detail.Description,
                         id,
                         (detail.StackFrames.Count > 0)

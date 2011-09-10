@@ -4,11 +4,11 @@ using System.Web;
 
 namespace NHibernate.Glimpse.Core
 {
-    internal class BatcherInternalLogger : IInternalLogger
+    internal class TransactionInternalLogger : IInternalLogger
     {
-        public void DebugFormat(string format, params object[] args)
+        public void Debug(object message)
         {
-            if (format == null) return;
+            if (message == null) return;
             if (!LoggerFactory.LogRequest()) return;
             var context = HttpContext.Current;
             if (context == null) return;
@@ -18,10 +18,17 @@ namespace NHibernate.Glimpse.Core
                 l = new List<LogStatistic>();
                 context.Items.Add(Plugin.GlimpseSqlStatsKey, l);
             }
+            var timestamp = DateTime.Now;
             l.Add(new LogStatistic
-            {
-                Metric = string.Format(format, args),
-            });
+                      {
+                          TransactionNotification =
+                              string.Format("{0}{1}", message,
+                                            string.Format(" @ {0}.{1}.{2}.{3}",
+                                                          timestamp.Hour.ToString().PadLeft(2, '0'),
+                                                          timestamp.Minute.ToString().PadLeft(2, '0'),
+                                                          timestamp.Second.ToString().PadLeft(2, '0'),
+                                                          timestamp.Millisecond.ToString().PadLeft(3, '0')))
+                      });
         }
 
         public void Error(object message)
@@ -49,12 +56,12 @@ namespace NHibernate.Glimpse.Core
 
         }
 
-        public void Debug(object message)
+        public void Debug(object message, Exception exception)
         {
 
         }
 
-        public void Debug(object message, Exception exception)
+        public void DebugFormat(string format, params object[] args)
         {
 
         }

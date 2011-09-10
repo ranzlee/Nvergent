@@ -41,10 +41,10 @@ namespace NHibernate.Glimpse.Core
                     methods.Add(frame.GetMethod());
                 }
             }
-            var l = (IList<SqlStatistic>)context.Items[Plugin.GlimpseSqlStatsKey];
+            var l = (IList<LogStatistic>)context.Items[Plugin.GlimpseSqlStatsKey];
             if (l == null)
             {
-                l = new List<SqlStatistic>();
+                l = new List<LogStatistic>();
                 context.Items.Add(Plugin.GlimpseSqlStatsKey, l);
             }
             // ReSharper disable ConditionIsAlwaysTrueOrFalse
@@ -52,7 +52,7 @@ namespace NHibernate.Glimpse.Core
                 .Select(method => string.Format("{0} -> {1}", (method.DeclaringType == null) ? "DYNAMIC" : method.DeclaringType.ToString(), method))
                 .ToList();
             // ReSharper restore ConditionIsAlwaysTrueOrFalse
-            l.Add(new SqlStatistic
+            l.Add(new LogStatistic
                       {
                           Sql = message.ToString(),
                           Timestamp = DateTime.Now,
