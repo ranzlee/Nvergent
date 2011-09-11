@@ -27,6 +27,7 @@ namespace NHibernate.Glimpse.Core
             var url = context.Request.Url;
             var info = new RequestDebugInfo {GlimpseKey = Guid.NewGuid()};
             if (url != null) info.Url = url.AbsolutePath;
+            DebugInfoDetail lastDebugDetail = null; 
             foreach (var loggingEvent in events)
             {
                 if (!string.IsNullOrWhiteSpace(loggingEvent.Sql))
@@ -38,36 +39,71 @@ namespace NHibernate.Glimpse.Core
                     if (detail.StartsWith("insert", StringComparison.OrdinalIgnoreCase)) inserts++;
                     if (detail.StartsWith("batch commands:", StringComparison.OrdinalIgnoreCase)) batchCommands++;
                     detail = string.Format("<pre class='brush: sql'>{0}</pre>", detail.Replace(", @p", ",\n\t@p"));
-                    info.Details.Add(new DebugInfoDetail
-                    {
-                        Description = detail,
-                        Timestamp = loggingEvent.Timestamp,
-                        StackFrames = loggingEvent.StackFrames,
-                        IsSqlNotification = true
-                    });    
+                    var debugDetail = new DebugInfoDetail
+                                          {
+                                              Description = detail,
+                                              Timestamp = loggingEvent.Timestamp,
+                                              StackFrames = loggingEvent.StackFrames,
+                                              IsSqlNotification = true
+                                          };
+                    info.Details.Add(debugDetail);
+                    lastDebugDetail = debugDetail;
                 }
                 if (!string.IsNullOrWhiteSpace(loggingEvent.Metric))
                 {
-                    info.Details.Add(new DebugInfoDetail
-                    {
-                        Description = loggingEvent.Metric
-                    });
+                    var debugDetail = new DebugInfoDetail
+                                          {
+                                              Description = loggingEvent.Metric
+                                          };
+                    info.Details.Add(debugDetail);
+                    lastDebugDetail = debugDetail;
                 }
                 if (!string.IsNullOrWhiteSpace(loggingEvent.ConnectionNotification))
                 {
-                    info.Details.Add(new DebugInfoDetail
-                    {
-                        Description = loggingEvent.ConnectionNotification,
-                        IsConnectionNotification = true
-                    });
+                    var debugDetail = new DebugInfoDetail
+                                          {
+                                              Description = loggingEvent.ConnectionNotification,
+                                              IsConnectionNotification = true
+                                          };
+                    info.Details.Add(debugDetail);
+                    lastDebugDetail = debugDetail;
                 }
                 if (!string.IsNullOrWhiteSpace(loggingEvent.TransactionNotification))
                 {
-                    info.Details.Add(new DebugInfoDetail
+                    var debugDetail = new DebugInfoDetail
+                                          {
+                                              Description = loggingEvent.TransactionNotification,
+                                              IsTransactionNotification = true
+                                          };
+                    info.Details.Add(debugDetail);
+                    lastDebugDetail = debugDetail;
+                }
+                if (!string.IsNullOrWhiteSpace(loggingEvent.FlushNotification))
+                {
+                    var debugDetail = new DebugInfoDetail
                     {
-                        Description = loggingEvent.TransactionNotification,
-                        IsTransactionNotification = true
-                    });
+                        Description = loggingEvent.FlushNotification,
+                        IsFlushNotification = true
+                    };
+                    info.Details.Add(debugDetail);
+                    lastDebugDetail = debugDetail;
+                }
+                if (!string.IsNullOrWhiteSpace(loggingEvent.LoadNotification))
+                {
+                    if (lastDebugDetail != null && lastDebugDetail.IsLoadNotification)
+                    {
+                        lastDebugDetail.Description += loggingEvent.LoadNotification;
+                    }
+                    else
+                    {
+                        var debugDetail = new DebugInfoDetail
+                        {
+                            Description = string.Format("Loaded: {0}", loggingEvent.LoadNotification),
+                            IsLoadNotification = true
+                        };
+                        info.Details.Add(debugDetail);
+                        lastDebugDetail = debugDetail;    
+                    }
                 }
             }
             info.Selects = selects;
@@ -199,6 +235,29 @@ namespace NHibernate.Glimpse.Core
                     info.Url,
                     info.Summary);
                 sb.Append(info.EntityDetails);
+                sb.Append("<div class='verticalSpacer'></div>");
+                sb.Append("<div class='logsinks'>Logging Sinks Enabled (configurable in appsettings) :</div>");
+                if (LoggerFactory.HasCommandLogger)
+                {
+                    sb.Append("<div class='metricKey'>Command</div>");
+                }
+                if (LoggerFactory.HasConnectionLogger)
+                {
+                    sb.Append("<div class='connectionKey'>Connection</div>");
+                }
+                if (LoggerFactory.HasFlushLogger)
+                {
+                    sb.Append("<div class='flushKey'>Flush</div>");
+                }
+                if (LoggerFactory.HasLoadLogger)
+                {
+                    sb.Append("<div class='loadKey'>Load</div>");
+                }
+                if (LoggerFactory.HasTransactionLogger)
+                {
+                    sb.Append("<div class='transactionKey'>Transaction</div>");
+                }
+                sb.Append("<div class='verticalSpacer'></div>");
                 foreach (var detail in info.Details)
                 {
                     var id = Guid.NewGuid().ToString();
@@ -210,7 +269,11 @@ namespace NHibernate.Glimpse.Core
                                 ? "connection" 
                                 : (detail.IsTransactionNotification) 
                                     ? "transaction" 
-                                    : "metric",
+                                    : (detail.IsLoadNotification) 
+                                        ? "load" 
+                                        : (detail.IsFlushNotification) 
+                                            ? "flush" 
+                                            : "metric",
                         detail.Description,
                         id,
                         (detail.StackFrames.Count > 0)

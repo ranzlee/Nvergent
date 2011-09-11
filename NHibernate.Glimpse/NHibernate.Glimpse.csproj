@@ -42,6 +42,7 @@
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.Composition" />
+    <Reference Include="System.Configuration" />
     <Reference Include="System.Core" />
     <Reference Include="System.Data" />
     <Reference Include="System.Web" />
@@ -51,6 +52,8 @@
     <Compile Include="Core\ConnectionInternalLogger.cs" />
     <Compile Include="Core\DebugInfoDetail.cs" />
     <Compile Include="Core\EntityLoadedStatistic.cs" />
+    <Compile Include="Core\FlushInternalLogger.cs" />
+    <Compile Include="Core\LoadInternalLogger.cs" />
     <Compile Include="Core\TransactionInternalLogger.cs" />
     <Compile Include="EntityPostLoadListener.cs" />
     <Compile Include="Core\NoLogger.cs" />

@@ -14,7 +14,11 @@ namespace NHibernate.Glimpse.Core
 
         internal string Metric { get; set; }
 
+        internal string LoadNotification { get; set; }
+
         internal string ConnectionNotification { get; set; }
+
+        internal string FlushNotification { get; set; }
 
         internal string TransactionNotification { get; set; }
 

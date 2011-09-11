@@ -1,5 +1,12 @@
+using System;
+using System.Collections.Generic;
+using System.Configuration;
+using System.Linq;
 using System.Web;
+using NHibernate.AdoNet;
 using NHibernate.Connection;
+using NHibernate.Engine;
+using NHibernate.Event.Default;
 using NHibernate.Glimpse.Core;
 using NHibernate.Transaction;
 
@@ -8,10 +15,54 @@ namespace NHibernate.Glimpse
     public class LoggerFactory : ILoggerFactory
     {
         private readonly IInternalLogger _connectionLogger = new ConnectionInternalLogger();
+        private readonly IInternalLogger _flushLogger = new FlushInternalLogger();
+        private readonly IInternalLogger _loadLogger = new LoadInternalLogger();
         private readonly IInternalLogger _transactionLogger = new TransactionInternalLogger();
         private readonly IInternalLogger _sqlLogger = new SqlInternalLogger();
         private readonly IInternalLogger _batcherLogger = new BatcherInternalLogger();
         private readonly IInternalLogger _noLogger = new NoLogger();
+        private static readonly IList<string> Loggers = new List<string>();
+
+        public static bool HasCommandLogger
+        {
+            get { return Loggers.Contains("command"); }
+        }
+
+        public static bool HasConnectionLogger
+        {
+            get { return Loggers.Contains("connection"); }
+        }
+
+        public static bool HasFlushLogger
+        {
+            get { return Loggers.Contains("flush"); }
+        }
+
+        public static bool HasLoadLogger
+        {
+            get { return Loggers.Contains("load"); }
+        }
+
+        public static bool HasTransactionLogger
+        {
+            get { return Loggers.Contains("transaction"); }
+        }
+
+        public LoggerFactory()
+        {
+            if (!ConfigurationManager.AppSettings.AllKeys.Contains("NHibernate.Glimpse.Loggers")) return;
+            var reader = new AppSettingsReader();
+            var loggersString = reader.GetValue("NHibernate.Glimpse.Loggers", typeof(string));
+            if (loggersString == null) return;
+            var loggers = loggersString
+                .ToString()
+                .Split(new[] {','}, StringSplitOptions.RemoveEmptyEntries)
+                .ToList();
+            foreach (var logger in loggers)
+            {
+                Loggers.Add(logger.Trim().ToLower());
+            }
+        }
 
         public IInternalLogger LoggerFor(string keyName)
         {
@@ -22,10 +73,35 @@ namespace NHibernate.Glimpse
         public IInternalLogger LoggerFor(System.Type type)
         {
             if (type == null) return _noLogger;
-            if (type == typeof(AdoNet.AbstractBatcher)) return _batcherLogger;
-            if (type == typeof(ConnectionProvider)) return _connectionLogger;
-            if (type == typeof(DriverConnectionProvider)) return _connectionLogger;
-            if (type == typeof(AdoTransaction)) return _transactionLogger;
+            return GetLogger(type);
+        }
+
+        private IInternalLogger GetLogger(System.Type logger)
+        {
+            if (logger == typeof(AbstractBatcher))
+            {
+                if (HasCommandLogger) return _batcherLogger;
+            }
+            if (logger == typeof(ConnectionProvider))
+            {
+                if (HasConnectionLogger) return _connectionLogger;
+            }
+            if (logger == typeof(DriverConnectionProvider))
+            {
+                if (HasConnectionLogger) return _connectionLogger;
+            }
+            if (logger == typeof(AdoTransaction))
+            {
+                if (HasTransactionLogger) return _transactionLogger;
+            }
+            if (logger == typeof(TwoPhaseLoad))
+            {
+                if (HasLoadLogger) return _loadLogger;
+            }
+            if (logger == typeof(AbstractFlushingEventListener))
+            {
+                if (HasFlushLogger) return _flushLogger;
+            }
             return _noLogger;
         }
 
