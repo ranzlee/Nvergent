@@ -71,8 +71,9 @@
 .syntaxhighlighter .line {
   white-space: pre !important;
 }
-.syntaxhighlighter table {
-  width: 100% !important;
+.syntaxhighlighter table
+{
+    width: 100% !important;
 }
 .syntaxhighlighter table caption {
   text-align: left !important;
@@ -229,11 +230,15 @@
 .syntaxhighlighter {
   background-color: white !important;
 }
-.syntaxhighlighter .line.alt1 {
-  background-color: white !important;
+.syntaxhighlighter .line.alt1
+{
+    /*background-color: white !important;*/
+    background-color: #FFE9D2 !important;
 }
-.syntaxhighlighter .line.alt2 {
-  background-color: white !important;
+.syntaxhighlighter .line.alt2 
+{
+    /*background-color: white !important;*/
+    background-color: #FFE9D2 !important;
 }
 .syntaxhighlighter .line.highlighted.alt1, .syntaxhighlighter .line.highlighted.alt2 {
   background-color: #c3defe !important;

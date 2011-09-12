@@ -236,7 +236,7 @@ namespace NHibernate.Glimpse.Core
                     info.Summary);
                 sb.Append(info.EntityDetails);
                 sb.Append("<div class='verticalSpacer'></div>");
-                sb.Append("<div class='logsinks'>Logging Sinks Enabled (configurable in appsettings) :</div>");
+                sb.Append("<div class='logsinks'>Logging Sinks Enabled (configurable in appSettings) :</div>");
                 if (LoggerFactory.HasCommandLogger)
                 {
                     sb.Append("<div class='metricKey'>Command</div>");

@@ -22,7 +22,7 @@ namespace NHibernate.Glimpse.Core
             l.Add(new LogStatistic
                       {
                           TransactionNotification =
-                              string.Format("{0}{1}", message,
+                              string.Format("{0}{1}", message.ToString().Trim().UppercaseFirst(),
                                             string.Format(" @ {0}.{1}.{2}.{3}",
                                                           timestamp.Hour.ToString().PadLeft(2, '0'),
                                                           timestamp.Minute.ToString().PadLeft(2, '0'),

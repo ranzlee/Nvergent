@@ -24,7 +24,7 @@ namespace NHibernate.Glimpse.Core
             var timestamp = DateTime.Now;
             l.Add(new LogStatistic
                       {
-                          LoadNotification = message.ToString().Replace(TargetMessage, string.Empty)
+                          LoadNotification = message.ToString().Replace(TargetMessage, string.Empty).Trim().UppercaseFirst()
                       });
         }
 

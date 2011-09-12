@@ -20,7 +20,7 @@ namespace NHibernate.Glimpse.Core
             }
             l.Add(new LogStatistic
             {
-                Metric = string.Format(format, args),
+                Metric = string.Format(format.Trim().UppercaseFirst(), args),
             });
         }
 

@@ -40,7 +40,6 @@ namespace NHibernate.Glimpse
         {
             context.Response.Write("<html><head></head><body>");
             context.Response.Write("<h2 style='font-family: arial;'>NHibernate.Glimpse</h2>");
-            context.Response.Write("<br />");
             context.Response.Write("<div style='font-family: arial;'>This plugin attempts to be as unobtrusive to NHibernate as possible. ");
             context.Response.Write("The only NHibernate configuration automatically overridden is the ");
             context.Response.Write("LoggerFactory (in appSettings). This was primarily to avoid a dependency on Log4Net. ");
@@ -68,7 +67,10 @@ namespace NHibernate.Glimpse
             context.Response.Write("This is because Glimpse can cause lazy loaded collections to load as a result of view model inspection. ");
             context.Response.Write("I strongly recommend that you never bind an entity directly to a view - use a view model instead. ");
             context.Response.Write("This is a better design choice IMO, regardless of Glimpse. ");
-            context.Response.Write("Also, depending on how the NHibernate unit of work is implemented in your application, you might notice that ");
+            context.Response.Write("If you must bind your entities to your views and you notice performance problems when using Glimpse, blacklist the Views plugin (see the Glimpse readme for details).</div>");
+            context.Response.Write("<div style='font-family: courier;'>&lt;pluginBlacklist&gt;...&lt;add plugin=\"Glimpse.Mvc3.Plugin.Views\"/&gt;...</div>");
+            context.Response.Write("<br />");
+            context.Response.Write("<div style='font-family: arial;'>Also, depending on how the NHibernate unit of work is implemented in your application, you might notice that ");
             context.Response.Write("the log is missing information (i.e. the last command exection, transaction commit, or connection close).  This is ");
             context.Response.Write("a timing issue and is outside of the plugin's control.  If you notice this, you can flush the ISession prior to ending the request ");
             context.Response.Write("to atleast get the SQL, command, reader, and flush statistics.");
