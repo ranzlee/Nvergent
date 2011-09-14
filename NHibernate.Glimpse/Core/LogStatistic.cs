@@ -12,7 +12,9 @@ namespace NHibernate.Glimpse.Core
 
         internal string Sql { get; set; }
 
-        internal string Metric { get; set; }
+        internal string CommandNotification { get; set; }
+
+        internal bool IsSqlString { get; set; }
 
         internal string LoadNotification { get; set; }
 

@@ -48,20 +48,21 @@
     <Reference Include="System.Web" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Core\BatcherInternalLogger.cs" />
-    <Compile Include="Core\ConnectionInternalLogger.cs" />
+    <Compile Include="InternalLoggers\BatcherInternalLogger.cs" />
+    <Compile Include="InternalLoggers\ConnectionInternalLogger.cs" />
     <Compile Include="Core\DebugInfoDetail.cs" />
     <Compile Include="Core\EntityLoadedStatistic.cs" />
     <Compile Include="Core\Extensions.cs" />
-    <Compile Include="Core\FlushInternalLogger.cs" />
-    <Compile Include="Core\LoadInternalLogger.cs" />
-    <Compile Include="Core\TransactionInternalLogger.cs" />
+    <Compile Include="InternalLoggers\FlushInternalLogger.cs" />
+    <Compile Include="InternalLoggers\LoadInternalLogger.cs" />
+    <Compile Include="InternalLoggers\SessionInternalLogger.cs" />
+    <Compile Include="InternalLoggers\TransactionInternalLogger.cs" />
     <Compile Include="EntityPostLoadListener.cs" />
-    <Compile Include="Core\NoLogger.cs" />
+    <Compile Include="InternalLoggers\NoLogger.cs" />
     <Compile Include="LoggerFactory.cs" />
-    <Compile Include="Core\SqlLogParser.cs" />
+    <Compile Include="Core\LogParser.cs" />
     <Compile Include="Plugin.cs" />
-    <Compile Include="Core\SqlInternalLogger.cs" />
+    <Compile Include="InternalLoggers\SqlInternalLogger.cs" />
     <Compile Include="Core\LogStatistic.cs" />
     <Compile Include="Profiler.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

@@ -9,7 +9,7 @@ using System.Web;
 
 namespace NHibernate.Glimpse.Core
 {
-    public static class SqlLogParser
+    public static class LogParser
     {
         private static string _stylesheet;
         private static string _script;
@@ -49,11 +49,11 @@ namespace NHibernate.Glimpse.Core
                     info.Details.Add(debugDetail);
                     lastDebugDetail = debugDetail;
                 }
-                if (!string.IsNullOrWhiteSpace(loggingEvent.Metric))
+                if (!string.IsNullOrWhiteSpace(loggingEvent.CommandNotification))
                 {
                     var debugDetail = new DebugInfoDetail
                                           {
-                                              Description = loggingEvent.Metric
+                                              Description = loggingEvent.CommandNotification
                                           };
                     info.Details.Add(debugDetail);
                     lastDebugDetail = debugDetail;

@@ -1,33 +1,63 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
 using System.Web;
+using Glimpse.Core.Extensibility;
+using NHibernate.Glimpse.Core;
 
-namespace NHibernate.Glimpse.Core
+namespace NHibernate.Glimpse.InternalLoggers
 {
-    internal class ConnectionInternalLogger : IInternalLogger
+    internal class SqlInternalLogger : IInternalLogger
     {
+        private static readonly Assembly ThisAssem = typeof(SqlInternalLogger).Assembly;
+        private static readonly Assembly NhAssem = typeof(IInternalLogger).Assembly;
+        private static readonly Assembly GlimpseAssem = typeof(IGlimpsePlugin).Assembly;
+
         public void Debug(object message)
         {
             if (message == null) return;
             if (!LoggerFactory.LogRequest()) return;
             var context = HttpContext.Current;
             if (context == null) return;
+
+            var stackFrames = new System.Diagnostics.StackTrace().GetFrames();
+            var methods = new List<MethodBase>();
+            if (stackFrames != null)
+            {
+                foreach (var frame in stackFrames)
+                {
+                    var meth = frame.GetMethod();
+                    var type = meth.DeclaringType;
+                    // ReSharper disable ConditionIsAlwaysTrueOrFalse
+                    //this can happen for emitted types
+                    if (type != null)
+                    // ReSharper restore ConditionIsAlwaysTrueOrFalse
+                    {
+                        var assem = type.Assembly;
+                        if (assem == ThisAssem) continue;
+                        if (assem == NhAssem) continue;
+                        if (assem == GlimpseAssem) continue;    
+                    }
+                    methods.Add(frame.GetMethod());
+                }
+            }
             var l = (IList<LogStatistic>)context.Items[Plugin.GlimpseSqlStatsKey];
             if (l == null)
             {
                 l = new List<LogStatistic>();
                 context.Items.Add(Plugin.GlimpseSqlStatsKey, l);
             }
-            var timestamp = DateTime.Now;
+            // ReSharper disable ConditionIsAlwaysTrueOrFalse
+            var frames = methods
+                .Select(method => string.Format("{0} -> {1}", (method.DeclaringType == null) ? "DYNAMIC" : method.DeclaringType.ToString(), method))
+                .ToList();
+            // ReSharper restore ConditionIsAlwaysTrueOrFalse
             l.Add(new LogStatistic
                       {
-                          ConnectionNotification =
-                              string.Format("{0}{1}", message.ToString().Trim().UppercaseFirst(),
-                                            string.Format(" @ {0}.{1}.{2}.{3}",
-                                                          timestamp.Hour.ToString().PadLeft(2, '0'),
-                                                          timestamp.Minute.ToString().PadLeft(2, '0'),
-                                                          timestamp.Second.ToString().PadLeft(2, '0'),
-                                                          timestamp.Millisecond.ToString().PadLeft(3, '0')))
+                          Sql = message.ToString(),
+                          Timestamp = DateTime.Now,
+                          StackFrames = frames
                       });
         }
 

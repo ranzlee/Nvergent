@@ -1,8 +1,9 @@
 using System;
 using System.Collections.Generic;
 using System.Web;
+using NHibernate.Glimpse.Core;
 
-namespace NHibernate.Glimpse.Core
+namespace NHibernate.Glimpse.InternalLoggers
 {
     internal class FlushInternalLogger : IInternalLogger
     {

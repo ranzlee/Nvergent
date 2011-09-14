@@ -29,7 +29,7 @@ namespace NHibernate.Glimpse
                                ? string.Empty
                                : context.Request.ApplicationPath.TrimEnd(new[] { '/' });
             var cookie = GetCookie(context);
-            var stat = SqlLogParser.Transform(context);
+            var stat = LogParser.Transform(context);
             if (stat == null) return string.Empty;
             var stats = Statistics.GetOrAdd(cookie.Value, new List<RequestDebugInfo>());
             stats.Add(stat);
@@ -51,7 +51,7 @@ namespace NHibernate.Glimpse
             {
                 values.Add(stat.EntitiesLoaded);
             }
-            values.Add(string.Format("!<a href='{0}/nhibernate.glimpse.axd?key={1}&show=sql' target='_blank'>Launch</a>!", path, stat.GlimpseKey));
+            values.Add(string.Format("!<a href='{0}/nhibernate.glimpse.axd?{1}={2}' target='_blank'>Launch</a>!", path, Profiler.Key, stat.GlimpseKey));
             data.Add(values.ToArray());
             object[] factoryHeader = null;
             var factoryData = new List<object> {new object[] {"Key", "Value"}};
@@ -150,7 +150,7 @@ namespace NHibernate.Glimpse
                 var path = (string.IsNullOrWhiteSpace(HttpContext.Current.Request.ApplicationPath))
                                ? string.Empty
                                : HttpContext.Current.Request.ApplicationPath.TrimEnd(new[] { '/' });
-                return string.Format("{0}/nhibernate.glimpse.axd?key=help", path);
+                return string.Format("{0}/nhibernate.glimpse.axd?{1}={2}", path, Profiler.Key, Profiler.Help);
             }
         }
     }

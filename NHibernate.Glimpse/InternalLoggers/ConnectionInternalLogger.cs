@@ -1,10 +1,11 @@
 using System;
 using System.Collections.Generic;
 using System.Web;
+using NHibernate.Glimpse.Core;
 
-namespace NHibernate.Glimpse.Core
+namespace NHibernate.Glimpse.InternalLoggers
 {
-    internal class TransactionInternalLogger : IInternalLogger
+    internal class ConnectionInternalLogger : IInternalLogger
     {
         public void Debug(object message)
         {
@@ -21,7 +22,7 @@ namespace NHibernate.Glimpse.Core
             var timestamp = DateTime.Now;
             l.Add(new LogStatistic
                       {
-                          TransactionNotification =
+                          ConnectionNotification =
                               string.Format("{0}{1}", message.ToString().Trim().UppercaseFirst(),
                                             string.Format(" @ {0}.{1}.{2}.{3}",
                                                           timestamp.Hour.ToString().PadLeft(2, '0'),

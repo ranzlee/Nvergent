@@ -7,6 +7,9 @@ namespace NHibernate.Glimpse
 {
     public class Profiler : IHttpHandler
     {
+        public const string Key = "key";
+        public const string Help = "help";
+
         public bool IsReusable
         {
             get { return true; }
@@ -15,20 +18,17 @@ namespace NHibernate.Glimpse
         public void ProcessRequest(HttpContext context)
         {
             if (context == null) return;
-            var key = context.Request.QueryString["key"];
+            var key = context.Request.QueryString[Key];
             if (!string.IsNullOrWhiteSpace(key))
             {
-                if (key.ToLower().Trim() == "help")
+                switch (key.ToLower().Trim())
                 {
-                    ShowHelp(context);
-                }
-                else
-                {
-                    var show = context.Request.QueryString["show"];
-                    if (show == "sql")
-                    {
-                        ShowSql(context, key);
-                    }    
+                    case Help:
+                        ShowHelp(context);
+                        break;
+                    default:
+                        ShowDetails(context, key);
+                        break;
                 }
             }
             context.Items.Add(Plugin.IngnoreResponseKey, true);
@@ -86,7 +86,7 @@ namespace NHibernate.Glimpse
             context.Response.Write("</body></html>");
         }
 
-        private static void ShowSql(HttpContext context, string key)
+        private static void ShowDetails(HttpContext context, string key)
         {
             if (context == null) return;
             var cookie = context.Request.Cookies[Plugin.GlimpseCookie];
@@ -100,8 +100,8 @@ namespace NHibernate.Glimpse
             }
             if (info == null) info = new RequestDebugInfo();
             context.Response.Write(string.Format("<html><head>{0}</head><body>{1}</body></html>",
-                                                 SqlLogParser.GetCss(),
-                                                 SqlLogParser.GetDebugInfo(info)));
+                                                 LogParser.GetCss(),
+                                                 LogParser.GetDebugInfo(info)));
         }
     }
 }

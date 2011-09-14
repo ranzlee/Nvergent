@@ -1,17 +1,15 @@
 using System;
 using System.Collections.Generic;
 using System.Web;
+using NHibernate.Glimpse.Core;
 
-namespace NHibernate.Glimpse.Core
+namespace NHibernate.Glimpse.InternalLoggers
 {
-    internal class LoadInternalLogger : IInternalLogger
+    internal class SessionInternalLogger : IInternalLogger
     {
-        private const string TargetMessage = "done materializing entity";
-
-        public void Debug(object message)
+        public void DebugFormat(string format, params object[] args)
         {
-            if (message == null) return;
-            if (!message.ToString().ToLower().Trim().StartsWith(TargetMessage)) return;
+            if (format == null) return;
             if (!LoggerFactory.LogRequest()) return;
             var context = HttpContext.Current;
             if (context == null) return;
@@ -21,11 +19,10 @@ namespace NHibernate.Glimpse.Core
                 l = new List<LogStatistic>();
                 context.Items.Add(Plugin.GlimpseSqlStatsKey, l);
             }
-            var timestamp = DateTime.Now;
             l.Add(new LogStatistic
-                      {
-                          LoadNotification = message.ToString().Replace(TargetMessage, string.Empty).Trim().UppercaseFirst()
-                      });
+            {
+                ConnectionNotification = string.Format(format.Trim().UppercaseFirst(), args).ToUpper()
+            });
         }
 
         public void Error(object message)
@@ -53,12 +50,12 @@ namespace NHibernate.Glimpse.Core
 
         }
 
-        public void Debug(object message, Exception exception)
+        public void Debug(object message)
         {
 
         }
 
-        public void DebugFormat(string format, params object[] args)
+        public void Debug(object message, Exception exception)
         {
 
         }
