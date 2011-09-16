@@ -1,4 +1,4 @@
-﻿namespace NHibernate.DataAnnotations.Core
+﻿namespace NHibernate.DataAnnotations
 {
     /// <summary>
     /// Defines whether or not to cascade entity validation to this type. Typically, this interface is implemented

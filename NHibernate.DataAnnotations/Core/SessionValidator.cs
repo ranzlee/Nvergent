@@ -1,17 +1,16 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel.DataAnnotations;
-using NHibernate.DataAnnotations.Core;
 
-namespace NHibernate.DataAnnotations
+namespace NHibernate.DataAnnotations.Core
 {
-    public class SessionAuditor : ISessionAuditor
+    internal class SessionValidator : ISessionValidator
     {
-        private readonly SessionInterceptor _sessionInterceptor;
+        private readonly ValidationInterceptor _validationInterceptor;
 
-        internal SessionAuditor(SessionInterceptor sessionInterceptor)
+        internal SessionValidator(ValidationInterceptor validationInterceptor)
         {
-            _sessionInterceptor = sessionInterceptor;
+            _validationInterceptor = validationInterceptor;
         }
 
         public void Eval(ITransaction transaction, bool throwException = true)
@@ -27,12 +26,12 @@ namespace NHibernate.DataAnnotations
 
         public bool IsValid()
         {
-            return _sessionInterceptor.GetValidationResults().Count == 0;
+            return _validationInterceptor.GetValidationResults().Count == 0;
         }
 
         public string GetValidationErrorString()
         {
-            return _sessionInterceptor.ValidationErrorString;
+            return _validationInterceptor.ValidationErrorString;
         }
 
         public void ThrowValidationException()
@@ -42,12 +41,12 @@ namespace NHibernate.DataAnnotations
 
         public IDictionary<object, ReadOnlyCollection<ValidationResult>> GetValidationResults()
         {
-            return _sessionInterceptor.GetValidationResults();
+            return _validationInterceptor.GetValidationResults();
         }
 
         public ReadOnlyCollection<ValidationResult> GetValidationResults(object o)
         {
-            return _sessionInterceptor.GetValidationResults(o);
+            return _validationInterceptor.GetValidationResults(o);
         }
     }
 }

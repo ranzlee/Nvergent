@@ -10,7 +10,7 @@ using NHibernate.Type;
 
 namespace NHibernate.DataAnnotations
 {
-    public class SessionInterceptor : EmptyInterceptor
+    public class ValidationInterceptor : EmptyInterceptor
     {
         private ISession _session;
 
@@ -18,7 +18,7 @@ namespace NHibernate.DataAnnotations
 
         private readonly IDictionary<object, IEnumerable<ValidationResult>> _validationResults = new Dictionary<object, IEnumerable<ValidationResult>>();
 
-        public string ValidationErrorString
+        internal string ValidationErrorString
         {
             get
             {
@@ -42,14 +42,20 @@ namespace NHibernate.DataAnnotations
             }
         }
 
-        public IDictionary<object, ReadOnlyCollection<ValidationResult>> GetValidationResults()
+        internal IDictionary<object, ReadOnlyCollection<ValidationResult>> GetValidationResults()
         {
+            if (_session != null) _session.Flush();
             return _validationResults
                 .Keys
                 .ToDictionary(o => o, o => new ReadOnlyCollection<ValidationResult>(new List<ValidationResult>(_validationResults[o])));
         }
 
-        public ReadOnlyCollection<ValidationResult> GetValidationResults(object o)
+        public ISessionValidator GetSessionAuditor()
+        {
+            return new SessionValidator(this);
+        }
+
+        internal ReadOnlyCollection<ValidationResult> GetValidationResults(object o)
         {
             return !_validationResults.ContainsKey(o) 
                 ? new ReadOnlyCollection<ValidationResult>(new List<ValidationResult>()) 

@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace NHibernate.DataAnnotations
 {
-    public interface ISessionAuditor
+    public interface ISessionValidator
     {
         /// <summary>
         /// Runs validation on all modified entities in the session.  

@@ -11,6 +11,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NHibernate.DependencyInject
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NHibernate.DataAnnotations", "NHibernate.DataAnnotations\NHibernate.DataAnnotations.csproj", "{D4D040F4-6E7E-4C24-9416-25F632D8A14C}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NHibernate.DataAnnotations.Tests", "NHibernate.DataAnnotations.Tests\NHibernate.DataAnnotations.Tests.csproj", "{B6081D09-1599-4504-8026-88079B0FB6F5}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -37,6 +39,10 @@ Global
 		{D4D040F4-6E7E-4C24-9416-25F632D8A14C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D4D040F4-6E7E-4C24-9416-25F632D8A14C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D4D040F4-6E7E-4C24-9416-25F632D8A14C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B6081D09-1599-4504-8026-88079B0FB6F5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B6081D09-1599-4504-8026-88079B0FB6F5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B6081D09-1599-4504-8026-88079B0FB6F5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B6081D09-1599-4504-8026-88079B0FB6F5}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace NHibernate.DataAnnotations.Core
+namespace NHibernate.DataAnnotations
 {
     public class EntityPersistenceContext
     {
