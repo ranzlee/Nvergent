@@ -10,6 +10,11 @@ using NHibernate.Type;
 
 namespace NHibernate.DataAnnotations
 {
+    /// <summary>
+    /// Use an instance of this class when creating a new ISession.  If you need another custom
+    /// interceptor in addition to validation, extend from this class and remember to call base.Method on all
+    /// of your other interceptor's override methods.
+    /// </summary>
     public class ValidationInterceptor : EmptyInterceptor
     {
         private ISession _session;

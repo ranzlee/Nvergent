@@ -6,6 +6,8 @@ namespace NHibernate.DataAnnotations.Core
 {
     internal static class EntityValidator
     {
+        internal const string ContextKey = "EntityPersistenceContext";
+
         internal static IEnumerable<ValidationResult> DoMemberValidation(object o, EntityPersistenceContext context)
         {
             //cascade validation through all entity components associated with the entity
@@ -37,7 +39,7 @@ namespace NHibernate.DataAnnotations.Core
 
         private static ValidationContext GetValidationContext(object o, EntityPersistenceContext context)
         {
-            var items = new Dictionary<object, object> {{"EntityPersistenceContext", context}};
+            var items = new Dictionary<object, object> { { ContextKey, context } };
             return new ValidationContext(o, null, items);
         }
     }

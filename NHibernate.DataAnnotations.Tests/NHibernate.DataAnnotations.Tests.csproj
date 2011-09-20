@@ -60,6 +60,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Model\BallOfYarn.cs" />
+    <Compile Include="Model\Pet.cs" />
     <Compile Include="When_using_session_auditor.cs" />
     <Compile Include="Model\Cat.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
