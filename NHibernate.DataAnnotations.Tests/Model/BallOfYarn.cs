@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace NHibernate.DataAnnotations.Tests.Model
 {
-    public class BallOfYarn : IEntityComponent, IValidatableObject
+    public class BallOfYarn : IValidatableObject
     {
         public const string NotForPlayingValidation = "The crazy cat lady will be pissed about this";
         

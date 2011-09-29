@@ -71,6 +71,10 @@
       <Project>{D4D040F4-6E7E-4C24-9416-25F632D8A14C}</Project>
       <Name>NHibernate.DataAnnotations</Name>
     </ProjectReference>
+    <ProjectReference Include="..\NHibernate.Session\NHibernate.Session.csproj">
+      <Project>{795CD4A3-6EAF-42EF-ADB5-10DE613EB0D7}</Project>
+      <Name>NHibernate.Session</Name>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />

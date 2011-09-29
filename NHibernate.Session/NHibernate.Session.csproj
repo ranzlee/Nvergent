@@ -5,11 +5,11 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProductVersion>8.0.30703</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>{D4D040F4-6E7E-4C24-9416-25F632D8A14C}</ProjectGuid>
+    <ProjectGuid>{795CD4A3-6EAF-42EF-ADB5-10DE613EB0D7}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>NHibernate.DataAnnotations</RootNamespace>
-    <AssemblyName>NHibernate.DataAnnotations</AssemblyName>
+    <RootNamespace>NHibernate.Session</RootNamespace>
+    <AssemblyName>NHibernate.Session</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
@@ -38,8 +38,8 @@
       <HintPath>..\packages\NHibernate.3.2.0.4000\lib\Net35\NHibernate.dll</HintPath>
     </Reference>
     <Reference Include="System" />
-    <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Web" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -47,23 +47,13 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="EntityPersistenceContext.cs" />
-    <Compile Include="Core\EntityStateFrame.cs" />
-    <Compile Include="Core\EntityValidator.cs" />
-    <Compile Include="Core\ExpressionHelper.cs" />
-    <Compile Include="Core\Extensions.cs" />
-    <Compile Include="Extensions.cs" />
-    <Compile Include="ISessionValidator.cs" />
-    <Compile Include="Core\PersistenceOperationEnum.cs" />
-    <Compile Include="Core\SessionValidator.cs" />
-    <Compile Include="ValidationInterceptor.cs" />
+    <Compile Include="Marshaler.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="SessionFactoryCreated.cs" />
+    <Compile Include="SessionFactoryCreatedArgs.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="App_Readme\NHibernate.DependencyInjection.Readme..txt" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

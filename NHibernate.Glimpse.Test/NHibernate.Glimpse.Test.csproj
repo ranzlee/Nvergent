@@ -117,6 +117,7 @@
     </Compile>
     <Compile Include="Models\Cat.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="UnitOfWork.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="App_Data\Database.sdf" />
@@ -241,6 +242,10 @@
     <ProjectReference Include="..\NHibernate.Glimpse\NHibernate.Glimpse.csproj">
       <Project>{588C88A1-ADFD-4501-B42F-6977D932CCDD}</Project>
       <Name>NHibernate.Glimpse</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\NHibernate.Session\NHibernate.Session.csproj">
+      <Project>{795CD4A3-6EAF-42EF-ADB5-10DE613EB0D7}</Project>
+      <Name>NHibernate.Session</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />

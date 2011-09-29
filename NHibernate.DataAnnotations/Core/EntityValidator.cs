@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Linq;
 
 namespace NHibernate.DataAnnotations.Core
 {
@@ -19,21 +18,6 @@ namespace NHibernate.DataAnnotations.Core
                 validationResults, 
                 context.ValidateProperties);
             //validate entity components
-            var m = o.GetType().GetPropertiesFromCache().ToList();
-            var componentProperties = m
-                .Where(i => typeof(IEntityComponent).IsAssignableFrom(i.PropertyType))
-                .ToList();
-            foreach (var vp in componentProperties)
-            {
-                var vo = vp.GetValue(o, null);
-                if (ReferenceEquals(vo, null)) continue;
-                if (!((IEntityComponent)vo).CascadeValidation) continue;
-                validationContext = GetValidationContext(vo, context);
-                Validator.TryValidateObject(vo, 
-                                            validationContext, 
-                                            validationResults, 
-                                            context.ValidateProperties);
-            }
             return validationResults;
         }
 

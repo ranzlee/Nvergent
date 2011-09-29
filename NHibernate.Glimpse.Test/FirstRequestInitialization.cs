@@ -3,6 +3,7 @@ using NHibernate.Cfg;
 using NHibernate.DependencyInjection;
 using NHibernate.Event;
 using NHibernate.Glimpse.Test.Models;
+using NHibernate.Session;
 using NHibernate.Tool.hbm2ddl;
 
 namespace NHibernate.Glimpse.Test
@@ -36,13 +37,19 @@ namespace NHibernate.Glimpse.Test
                 tool.Execute(false, true, false);
 
                 config.SetListener(ListenerType.PostLoad, new EntityPostLoadListener());
-                
-                MvcApplication.SessionFactory = config.BuildSessionFactory();
-                Plugin.RegisterSessionFactory(MvcApplication.SessionFactory);
-                //Plugin.KeepLogHistory = false;
+
+                var marshaler = new Marshaler(config);
+                marshaler.OnSessionFactoryCreated += MarshalerOnSessionFactoryCreated;
+
+                UnitOfWork.Initialize(marshaler);
 
                 _initializedAlready = true;
             }
+        }
+
+        static void MarshalerOnSessionFactoryCreated(object sender, SessionFactoryCreatedArgs args)
+        {
+            Plugin.RegisterSessionFactory(args.SessionFactory);
         }
     }
 }

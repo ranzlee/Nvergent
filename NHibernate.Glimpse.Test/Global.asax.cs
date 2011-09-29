@@ -5,11 +5,8 @@ using System.Web.Routing;
 
 namespace NHibernate.Glimpse.Test
 {
-    
     public class MvcApplication : HttpApplication
     {
-        public static ISessionFactory SessionFactory { get; set; }
-
         public static void RegisterGlobalFilters(GlobalFilterCollection filters)
         {
             filters.Add(new HandleErrorAttribute());
@@ -41,6 +38,14 @@ namespace NHibernate.Glimpse.Test
 
             RegisterGlobalFilters(GlobalFilters.Filters);
             RegisterRoutes(RouteTable.Routes);
+        }
+
+        void Application_EndRequest(Object source, EventArgs e)
+        {
+            
+            UnitOfWork.Commit();
+            UnitOfWork.End();    
+            
         }
     }
 }

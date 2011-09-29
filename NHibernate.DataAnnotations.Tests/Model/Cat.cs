@@ -26,6 +26,16 @@ namespace NHibernate.DataAnnotations.Tests.Model
                 yield return new ValidationResult(CatsHaveNineLives);
             }
             if (Gender == "F" && _kittens.Count > 15) yield return new ValidationResult(TooManyKittens);
+            //cascade validation to toy
+            if (Toy != null)
+            {
+                var validationResults = new List<ValidationResult>();
+                Validator.TryValidateObject(Toy, new ValidationContext(Toy, null, null), validationResults, true);
+                foreach (var validationResult in validationResults)
+                {
+                    yield return validationResult;
+                }
+            }
         }
     }
 }

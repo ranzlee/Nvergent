@@ -1,5 +1,6 @@
 ﻿using NHibernate.Cfg;
 using NHibernate.DataAnnotations.Tests.Model;
+using NHibernate.Session;
 using NHibernate.Tool.hbm2ddl;
 using NUnit.Framework;
 
@@ -8,7 +9,8 @@ namespace NHibernate.DataAnnotations.Tests
     [TestFixture]
     public class When_using_session_auditor
     {
-        private readonly ISessionFactory _sessionFactory;
+        private readonly Marshaler _currentScope;
+        
 
         public When_using_session_auditor()
         {
@@ -18,26 +20,28 @@ namespace NHibernate.DataAnnotations.Tests
             //create the database
             var tool = new SchemaExport(config);
             tool.Execute(false, true, false);
-            //build the session factory
-            _sessionFactory = config.BuildSessionFactory();
+            //initialize context
+            _currentScope = new Marshaler(config, typeof(ValidationInterceptor));
         }
 
         [Test]
         public void Can_validate_a_simple_property()
         {
             var cat = new Cat {Name = "Beetlejuice", Gender = "F"};
-            using (var session = _sessionFactory.OpenSession(new ValidationInterceptor()))
+            try
             {
-                using (var t = session.BeginTransaction())
-                {
-                    session.SaveOrUpdate(cat);
-                    Assert.IsFalse(session.GetValidator().IsValid());
-                    var results = session.GetValidator().GetValidationResults();
-                    Assert.AreEqual(1, results.Count);
-                    Assert.AreEqual(1, results[cat].Count);
-                    Assert.AreEqual(Pet.NameLengthValidation, results[cat][0].ErrorMessage);
-                    session.GetValidator().Eval(t, false);
-                }
+                var session = _currentScope.CurrentSession;
+                session.SaveOrUpdate(cat);
+                Assert.IsFalse(session.GetValidator().IsValid());
+                var results = session.GetValidator().GetValidationResults();
+                Assert.AreEqual(1, results.Count);
+                Assert.AreEqual(1, results[cat].Count);
+                Assert.AreEqual(Pet.NameLengthValidation, results[cat][0].ErrorMessage);
+                session.GetValidator().Eval(session.Transaction, false);
+            }
+            finally
+            {
+                _currentScope.End();
             }
         }
 
@@ -45,23 +49,25 @@ namespace NHibernate.DataAnnotations.Tests
         public void IValidatableObject__is_invoked()
         {
             var cat = new Cat { Name = "Fluffy", Gender = "F" };
-            using (var session = _sessionFactory.OpenSession(new ValidationInterceptor()))
+            try
             {
-                using (var t = session.BeginTransaction())
+                var session = _currentScope.CurrentSession;
+                session.SaveOrUpdate(cat);
+                for (var i = 0; i < 16; i++)
                 {
-                    session.SaveOrUpdate(cat);
-                    for (var i = 0; i < 16; i++)
-                    {
-                        var kitten = new Cat { Name = string.Format("Baby{0}", i), Gender = "F" };
-                        cat.Kittens.Add(kitten);
-                    }
-                    Assert.IsFalse(session.GetValidator().IsValid());
-                    var results = session.GetValidator().GetValidationResults();
-                    Assert.AreEqual(1, results.Count);
-                    Assert.AreEqual(1, results[cat].Count);
-                    Assert.AreEqual(Pet.TooManyKittens, results[cat][0].ErrorMessage);
-                    session.GetValidator().Eval(t, false);
+                    var kitten = new Cat { Name = string.Format("Baby{0}", i), Gender = "F" };
+                    cat.Kittens.Add(kitten);
                 }
+                Assert.IsFalse(session.GetValidator().IsValid());
+                var results = session.GetValidator().GetValidationResults();
+                Assert.AreEqual(1, results.Count);
+                Assert.AreEqual(1, results[cat].Count);
+                Assert.AreEqual(Pet.TooManyKittens, results[cat][0].ErrorMessage);
+                session.GetValidator().Eval(session.Transaction, false);
+            }
+            finally
+            {
+                _currentScope.End();
             }
         }
 
@@ -69,40 +75,44 @@ namespace NHibernate.DataAnnotations.Tests
         public void A_persistence_context_is_provided_to_IValidatableObject()
         {
             var cat = new Cat { Name = "Fluffy", Gender = "F" };
-            using (var session = _sessionFactory.OpenSession(new ValidationInterceptor()))
+            try
             {
-                using (var t = session.BeginTransaction())
-                {
-                    session.SaveOrUpdate(cat);
-                    session.Flush();
-                    session.Delete(cat);
-                    Assert.IsFalse(session.GetValidator().IsValid());
-                    var results = session.GetValidator().GetValidationResults();
-                    Assert.AreEqual(1, results.Count);
-                    Assert.AreEqual(1, results[cat].Count);
-                    Assert.AreEqual(Cat.CatsHaveNineLives, results[cat][0].ErrorMessage);
-                    session.GetValidator().Eval(t, false);
-                }
+                var session = _currentScope.CurrentSession;
+                session.SaveOrUpdate(cat);
+                session.Flush();
+                session.Delete(cat);
+                Assert.IsFalse(session.GetValidator().IsValid());
+                var results = session.GetValidator().GetValidationResults();
+                Assert.AreEqual(1, results.Count);
+                Assert.AreEqual(1, results[cat].Count);
+                Assert.AreEqual(Cat.CatsHaveNineLives, results[cat][0].ErrorMessage);
+                session.GetValidator().Eval(session.Transaction, false);
+            }
+            finally
+            {
+                _currentScope.End();
             }
         }
 
         [Test]
-        public void Validation_can_be_cascaded_to_IEntityComponents()
+        public void Validation_can_be_cascaded_to_entity_components()
         {
             var cat = new Cat { Name = "Fluffy", Gender = "F" };
-            using (var session = _sessionFactory.OpenSession(new ValidationInterceptor()))
+            try
             {
-                using (var t = session.BeginTransaction())
-                {
-                    session.SaveOrUpdate(cat);
-                    cat.Toy = new BallOfYarn {IsUsedForSewing = true};
-                    Assert.IsFalse(session.GetValidator().IsValid());
-                    var results = session.GetValidator().GetValidationResults();
-                    Assert.AreEqual(1, results.Count);
-                    Assert.AreEqual(1, results[cat].Count);
-                    Assert.AreEqual(BallOfYarn.NotForPlayingValidation, results[cat][0].ErrorMessage);
-                    session.GetValidator().Eval(t, false);
-                }
+                var session = _currentScope.CurrentSession;
+                session.SaveOrUpdate(cat);
+                cat.Toy = new BallOfYarn { IsUsedForSewing = true };
+                Assert.IsFalse(session.GetValidator().IsValid());
+                var results = session.GetValidator().GetValidationResults();
+                Assert.AreEqual(1, results.Count);
+                Assert.AreEqual(1, results[cat].Count);
+                Assert.AreEqual(BallOfYarn.NotForPlayingValidation, results[cat][0].ErrorMessage);
+                session.GetValidator().Eval(session.Transaction, false);
+            }
+            finally
+            {
+                _currentScope.End();
             }
         }
 
@@ -113,38 +123,47 @@ namespace NHibernate.DataAnnotations.Tests
             var grannyCat = new Cat { Name = "Granny", Gender = "F" };
             var mommyCat = new Cat { Name = "Mommy", Gender = "F" };
             var babyCat = new Cat { Name = "Baby", Gender = "F" };
-            using (var session = _sessionFactory.OpenSession(new ValidationInterceptor()))
+            try
             {
-                using (var t = session.BeginTransaction())
-                {
-                    session.SaveOrUpdate(grannyCat);
-                    grannyCat.Kittens.Add(mommyCat);
-                    mommyCat.Parent = grannyCat;
-                    mommyCat.Kittens.Add(babyCat);
-                    babyCat.Parent = mommyCat;
-                    t.Commit();
-                }
+                var session = _currentScope.CurrentSession;
+                session.SaveOrUpdate(grannyCat);
+                grannyCat.Kittens.Add(mommyCat);
+                mommyCat.Parent = grannyCat;
+                mommyCat.Kittens.Add(babyCat);
+                babyCat.Parent = mommyCat;
+                _currentScope.Commit();
+            }
+            finally
+            {
+                _currentScope.End();
             }
             //act
-            using (var session = _sessionFactory.OpenSession(new ValidationInterceptor()))
+            try
             {
-                using (var t = session.BeginTransaction())
-                {
-                    babyCat = session.Get<Cat>(babyCat.Id);
-                    babyCat.Parent.Parent.Name = "Gramma";
-                    var siblingCat = new Cat { Name = "Sibling", Gender = "F"};
-                    babyCat.Parent.Kittens.Add(siblingCat);
-                    siblingCat.Parent = babyCat.Parent;
-                    t.Commit();
-                }
+                var session = _currentScope.CurrentSession;
+                babyCat = session.Get<Cat>(babyCat.Id);
+                babyCat.Parent.Parent.Name = "Gramma";
+                var siblingCat = new Cat { Name = "Sibling", Gender = "F" };
+                babyCat.Parent.Kittens.Add(siblingCat);
+                siblingCat.Parent = babyCat.Parent;
+                _currentScope.Commit();
+            }
+            finally
+            {
+                _currentScope.End();
             }
             //assert
-            using (var session = _sessionFactory.OpenSession(new ValidationInterceptor()))
+            try
             {
+                var session = _currentScope.CurrentSession;
                 babyCat = session.Get<Cat>(babyCat.Id);
                 //assert persistence
                 Assert.AreEqual(2, babyCat.Parent.Kittens.Count);
                 Assert.AreEqual("Gramma", babyCat.Parent.Parent.Name);
+            }
+            finally
+            {
+                _currentScope.End();
             }
         }
     }
