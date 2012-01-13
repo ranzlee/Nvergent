@@ -64,7 +64,8 @@ namespace NHibernate.DependencyInjection.Core
             var constructorParms = BytecodeProvider.EntityInjector.GetConstructorParameters(instanceType);
             var result = (constructorParms == null || constructorParms.Length == 0)
                              ? Activator.CreateInstance(proxyType)
-                             : Activator.CreateInstance(proxyType, constructorParms);
+                             : Activator.CreateInstance(proxyType, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance, null, constructorParms, null);
+                             //: Activator.CreateInstance(proxyType, constructorParms);
             if (result == null)
             {
                 throw new InvalidOperationException(string.Format("proxy {0} was not created - verify Activator.CreateInstance call in IEntityProvider", proxyType));
