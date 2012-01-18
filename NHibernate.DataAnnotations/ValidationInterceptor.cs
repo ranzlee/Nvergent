@@ -70,21 +70,21 @@ namespace NHibernate.DataAnnotations
         public override bool OnFlushDirty(object entity, object id, object[] currentState, object[] previousState, string[] propertyNames, IType[] types)
         {
             InitializeEntityStateQueue();
-            _entityStateQueue.Enqueue(new EntityStateFrame(entity, id, PersistenceOperationEnum.Updating, propertyNames, previousState));
+            _entityStateQueue.Enqueue(new EntityStateFrame(entity, id, PersistenceOperationEnum.Updating, propertyNames, types, currentState, previousState));
             return base.OnFlushDirty(entity, id, currentState, previousState, propertyNames, types);
         }
 
         public override bool OnSave(object entity, object id, object[] state, string[] propertyNames, IType[] types)
         {
             InitializeEntityStateQueue();
-            _entityStateQueue.Enqueue(new EntityStateFrame(entity, id, PersistenceOperationEnum.Adding, null, null));
+            _entityStateQueue.Enqueue(new EntityStateFrame(entity, id, PersistenceOperationEnum.Adding, propertyNames, types, state, null));
             return base.OnSave(entity, id, state, propertyNames, types);
         }
 
         public override void OnDelete(object entity, object id, object[] state, string[] propertyNames, IType[] types)
         {
             InitializeEntityStateQueue();
-            _entityStateQueue.Enqueue(new EntityStateFrame(entity, id, PersistenceOperationEnum.Removing, null, null));
+            _entityStateQueue.Enqueue(new EntityStateFrame(entity, id, PersistenceOperationEnum.Removing, propertyNames, types, state, null));
             base.OnDelete(entity, id, state, propertyNames, types);
         }
 
@@ -114,7 +114,7 @@ namespace NHibernate.DataAnnotations
                 while (_entityStateQueue.Count > 0)
                 {
                     var entityStateFrame = _entityStateQueue.Dequeue();
-                    ValidateEntity(entityStateFrame.Entity, entityStateFrame.Id, entityStateFrame.PersistenceOperation, entityStateFrame.PropertyNames, entityStateFrame.PreviousState);
+                    ValidateEntity(entityStateFrame.Entity, entityStateFrame.Id, entityStateFrame.PersistenceOperation, entityStateFrame.PropertyNames, entityStateFrame.PropertyTypes, entityStateFrame.CurrentState, entityStateFrame.PreviousState);
                 }
                 _entityStateQueue = null;
             }
@@ -127,12 +127,20 @@ namespace NHibernate.DataAnnotations
             base.AfterTransactionCompletion(tx);
         }
 
-        private void ValidateEntity(object o, object id, PersistenceOperationEnum persistenceOperation, IList<string> properties, IList<object> previousState)
+        private void ValidateEntity(object o, object id, PersistenceOperationEnum persistenceOperation, IList<string> properties, IList<IType> types, IList<object> currentState, IList<object> previousState)
         {
             if (ReferenceEquals(_session, null)) return;
             if (!ReferenceEquals(_session.Transaction, null) && _session.Transaction.WasRolledBack) return;
             var factoryName = _session.GetSessionImplementation().Factory.Settings.SessionFactoryName;
             var epc = new EntityPersistenceContext {FactoryName = factoryName, Id = id};
+            if (properties != null)
+            {
+                for (var i = 0; i < properties.Count; i++)
+                {
+                    if (currentState != null) epc.CurrentState.Add(properties[i], currentState.ElementAtOrDefault(i));
+                    if (types != null) epc.Types.Add(properties[i], types.ElementAtOrDefault(i));
+                }    
+            }
             switch (persistenceOperation)
             {
                 case PersistenceOperationEnum.Adding:
@@ -143,7 +151,7 @@ namespace NHibernate.DataAnnotations
                     if (properties == null || previousState == null) break;
                     for (var i = 0; i < properties.Count; i++ )
                     {
-                        epc.PreviousState.Add(properties[i], previousState[i]);    
+                        epc.PreviousState.Add(properties[i], previousState.ElementAtOrDefault(i));    
                     }
                     break;
                 case PersistenceOperationEnum.Removing:

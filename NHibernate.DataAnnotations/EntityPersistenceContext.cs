@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using NHibernate.Type;
 
 namespace NHibernate.DataAnnotations
 {
@@ -18,12 +19,28 @@ namespace NHibernate.DataAnnotations
 
         public bool IsBeingModified { get; internal set; }
 
+        private IDictionary<string, IType> _types = new Dictionary<string, IType>();
+
+        private IDictionary<string, object> _currentState = new Dictionary<string, object>();
+
         private IDictionary<string, object> _previousState = new Dictionary<string, object>();
 
-        public IDictionary<string, object> PreviousState 
+        public IDictionary<string, IType> Types
+        {
+            get { return _types; }
+            internal set { _types = value; }
+        }
+
+        public IDictionary<string, object> CurrentState 
+        {
+            get { return _currentState; }
+            internal set { _currentState = value; }
+        }
+
+        public IDictionary<string, object> PreviousState
         {
             get { return _previousState; }
             internal set { _previousState = value; }
-        } 
+        }
     }
 }
