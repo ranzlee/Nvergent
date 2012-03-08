@@ -22,7 +22,6 @@ namespace NHibernate.Glimpse.InternalLoggers
                 l = new List<LogStatistic>();
                 context.Items.Add(Plugin.GlimpseSqlStatsKey, l);
             }
-            var timestamp = DateTime.Now;
             l.Add(new LogStatistic
                       {
                           LoadNotification = message.ToString().Replace(TargetMessage, string.Empty).Trim().UppercaseFirst()

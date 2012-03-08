@@ -3,8 +3,6 @@ Microsoft Visual Studio Solution File, Format Version 11.00
 # Visual Studio 2010
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NHibernate.Glimpse", "NHibernate.Glimpse\NHibernate.Glimpse.csproj", "{588C88A1-ADFD-4501-B42F-6977D932CCDD}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NHibernate.Glimpse.Test", "NHibernate.Glimpse.Test\NHibernate.Glimpse.Test.csproj", "{6CC95289-9FA3-4666-84F2-BC42E83CA415}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NHibernate.DependencyInjection", "NHibernate.DependencyInjection\NHibernate.DependencyInjection.csproj", "{6160F667-0FDC-457A-B8A0-CECFA718D37B}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NHibernate.DependencyInjection.Tests", "NHibernate.DependencyInjection.Tests\NHibernate.DependencyInjection.Tests.csproj", "{814D27A2-7FB9-4427-9042-5DD902FB52D8}"
@@ -25,10 +23,6 @@ Global
 		{588C88A1-ADFD-4501-B42F-6977D932CCDD}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{588C88A1-ADFD-4501-B42F-6977D932CCDD}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{588C88A1-ADFD-4501-B42F-6977D932CCDD}.Release|Any CPU.Build.0 = Release|Any CPU
-		{6CC95289-9FA3-4666-84F2-BC42E83CA415}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{6CC95289-9FA3-4666-84F2-BC42E83CA415}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{6CC95289-9FA3-4666-84F2-BC42E83CA415}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{6CC95289-9FA3-4666-84F2-BC42E83CA415}.Release|Any CPU.Build.0 = Release|Any CPU
 		{6160F667-0FDC-457A-B8A0-CECFA718D37B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{6160F667-0FDC-457A-B8A0-CECFA718D37B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{6160F667-0FDC-457A-B8A0-CECFA718D37B}.Release|Any CPU.ActiveCfg = Release|Any CPU

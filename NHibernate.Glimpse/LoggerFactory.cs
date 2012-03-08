@@ -15,7 +15,6 @@ namespace NHibernate.Glimpse
 {
     public class LoggerFactory : ILoggerFactory
     {
-        private readonly IInternalLogger _sessionInternalLogger = new SessionInternalLogger();
         private readonly IInternalLogger _connectionLogger = new ConnectionInternalLogger();
         private readonly IInternalLogger _flushLogger = new FlushInternalLogger();
         private readonly IInternalLogger _loadLogger = new LoadInternalLogger();
@@ -80,11 +79,6 @@ namespace NHibernate.Glimpse
 
         private IInternalLogger GetLogger(System.Type logger)
         {
-            //if (logger == typeof(SessionImpl))
-            //{
-            //    return _sessionInternalLogger;
-            //}
-
             if (logger == typeof(AbstractBatcher))
             {
                 if (HasCommandLogger) return _batcherLogger;

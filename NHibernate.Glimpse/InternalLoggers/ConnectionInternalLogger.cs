@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Web;
 using NHibernate.Glimpse.Core;
 
@@ -25,10 +26,10 @@ namespace NHibernate.Glimpse.InternalLoggers
                           ConnectionNotification =
                               string.Format("{0}{1}", message.ToString().Trim().UppercaseFirst(),
                                             string.Format(" @ {0}.{1}.{2}.{3}",
-                                                          timestamp.Hour.ToString().PadLeft(2, '0'),
-                                                          timestamp.Minute.ToString().PadLeft(2, '0'),
-                                                          timestamp.Second.ToString().PadLeft(2, '0'),
-                                                          timestamp.Millisecond.ToString().PadLeft(3, '0')))
+                                                          timestamp.Hour.ToString(CultureInfo.InvariantCulture).PadLeft(2, '0'),
+                                                          timestamp.Minute.ToString(CultureInfo.InvariantCulture).PadLeft(2, '0'),
+                                                          timestamp.Second.ToString(CultureInfo.InvariantCulture).PadLeft(2, '0'),
+                                                          timestamp.Millisecond.ToString(CultureInfo.InvariantCulture).PadLeft(3, '0')))
                       });
         }
 

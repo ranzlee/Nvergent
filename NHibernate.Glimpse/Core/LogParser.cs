@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -282,10 +283,10 @@ namespace NHibernate.Glimpse.Core
                         (detail.Timestamp == DateTime.MinValue)
                             ? string.Empty
                             : string.Format(" @ {0}.{1}.{2}.{3}",
-                                      detail.Timestamp.Hour.ToString().PadLeft(2, '0'),
-                                      detail.Timestamp.Minute.ToString().PadLeft(2, '0'),
-                                      detail.Timestamp.Second.ToString().PadLeft(2, '0'),
-                                      detail.Timestamp.Millisecond.ToString().PadLeft(3, '0')));
+                                      detail.Timestamp.Hour.ToString(CultureInfo.InvariantCulture).PadLeft(2, '0'),
+                                      detail.Timestamp.Minute.ToString(CultureInfo.InvariantCulture).PadLeft(2, '0'),
+                                      detail.Timestamp.Second.ToString(CultureInfo.InvariantCulture).PadLeft(2, '0'),
+                                      detail.Timestamp.Millisecond.ToString(CultureInfo.InvariantCulture).PadLeft(3, '0')));
                     if (detail.StackFrames.Count > 1)
                     {
                         sb.AppendFormat("<div id='{0}' style='display : none'>", id);
